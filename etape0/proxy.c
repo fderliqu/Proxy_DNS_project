@@ -118,9 +118,9 @@ int main(void){
 	//	socklen_t tailleREP=sizeof(adresseREP);
   		unsigned char message[DNS_UDP_MAX_PACKET_SIZE];
   		int nboctets=recvfrom(s,message,DNS_UDP_MAX_PACKET_SIZE,0,(struct sockaddr *)&adresse,&taille);
-		nboctets = messageUDP(NAMESERVER_POLYTECH,"53",message,nboctets);
-	//	int nboctetsRepDNS = recvfrom(s,message,DNS_UDP_MAX_PACKET_SIZE,0,(struct sockaddr *)&adresseREP,&tailleREP);
-		sendto(s,message,nboctets,0,(struct sockaddr *)&adresse,taille);
+		messageUDP(NAMESERVER_MATHSINFO,"53",message,nboctets);
+		int nboctetsRepDNS = recvfrom(s,message,DNS_UDP_MAX_PACKET_SIZE,0,(struct sockaddr *)&adresseREP,&tailleREP);
+		sendto(s,message,nboctetsRepDNS,0,(struct sockaddr *)&adresseREP,tailleREP);
 	}
 	close(s);
 	return 0;
