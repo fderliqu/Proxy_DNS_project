@@ -3,7 +3,7 @@
 
 typedef struct logMsg_s {
 	int size;
-	char msg[1];
+	char * msg;
 } logMsg_t;
 
 int initLog(void *);
