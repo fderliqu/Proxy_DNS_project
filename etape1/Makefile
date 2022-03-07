@@ -1,6 +1,8 @@
 MAKE = make
 MAKECLEAN = make clean
 DIRS = libs/Reseau src
+export CC=gcc
+export CFLAGS=-Wall -Wextra -O2
 
 all:$(patsubst %,_DIR_%,$(DIRS))
 

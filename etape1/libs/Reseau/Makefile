@@ -4,9 +4,7 @@
 # Constantes liees au projet
 #
 
-CC=gcc
 AR=ar crus
-CFLAGS= -g -Wall -W -Wextra -O2
 # LDFLAGS=
 TARGET=../static/libreseau.a
 
