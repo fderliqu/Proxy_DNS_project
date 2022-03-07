@@ -1,14 +1,10 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-#include<stdint.h>
-#include <unistd.h>
+#ifndef _RESEAU_H_
+#define _RESEAU_H_
 #include<sys/types.h>
 #include<sys/socket.h>
 #include<netdb.h>
 #include"dns.h"
 #include"dns_server.h"
-
 int initialisationSocketUDP(char *);
 
 int boucleServeurUDP(int,void (* traitement)(int,unsigned char*,int,struct sockaddr*,int));
@@ -19,5 +15,5 @@ int messageUDP(
 		unsigned char *,
 		int);
 
-
+#endif
 

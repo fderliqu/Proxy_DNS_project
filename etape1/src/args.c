@@ -4,10 +4,6 @@
 #include<getopt.h>
 #include<string.h>
 
-
-//extern char *server;
-//extern char *port;
-
 int args(int argc, char * argv[],char * server, char * port){
 	int opt;
 	while(1){

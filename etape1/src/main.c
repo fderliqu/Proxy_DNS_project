@@ -1,7 +1,12 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include"dns.h"
+#include"dns_server.h"
 #include"reseau.h"
 #include"args.h"
 
-#define DEFAULT_SERVER "193.0.0.1"
+#define DEFAULT_SERVER "193.48.57.48"
 #define DEFAULT_PORT "53"
 #define MAX_SERVER 1024
 #define MAX_PORT 1024
