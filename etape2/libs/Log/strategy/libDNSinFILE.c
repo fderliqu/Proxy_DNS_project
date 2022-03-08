@@ -20,6 +20,6 @@ int addLog(logMsg_t * paquet){
 		fprintf(file,"%02x ",*octet);
 		octet++;
 	}
-	printf("\n");
+	fprintf(file,"\n",paquet->size);
 	return 0;
 }
