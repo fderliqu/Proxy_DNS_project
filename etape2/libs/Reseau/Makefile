@@ -20,7 +20,7 @@ all: $(TARGET)
 
 clean:
 	rm -f *.o
-	rm $(TARGET)
+	rm -f $(TARGET)
 
 #
 # Executable
