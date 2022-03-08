@@ -21,5 +21,6 @@ int addLog(logMsg_t * paquet){
 		octet++;
 	}
 	fprintf(file,"\n");
+	fflush(file);
 	return 0;
 }
