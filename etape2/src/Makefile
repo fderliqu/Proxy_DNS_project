@@ -7,10 +7,10 @@ TARGET = ../bin/main
 all: $(TARGET)
 	
 main.o : main.c
-	$(CC) -c $< $(INCDIR) $(LIBDIR) $(BIBLIO)
+	$(CC) $(CFLAGS) -c $< $(INCDIR) $(LIBDIR) $(BIBLIO)
 
 args.o : args.c
-	$(CC) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 $(TARGET): main.o args.o
 	$(CC) -o $@ $^ $(LIBDIR) $(BIBLIO)

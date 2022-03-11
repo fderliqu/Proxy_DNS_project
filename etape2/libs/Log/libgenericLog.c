@@ -3,8 +3,6 @@
 #include<dlfcn.h>
 #include"genericLog.h"
 
-#define STRAT1 "../static/libDNSinFILE.so"
-#define STRAT2 "../static/libstrat2.so"
 #define LIB_MAX_SIZE 100
 
 void * handle;

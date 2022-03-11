@@ -10,7 +10,7 @@
 FILE * file;
 
 int initLog(void * f){
-	file = fopen (f,"w");
+	file = fopen ((char *)f,"w");
 	if(file==NULL)exit(-1);
 	return 0;
 }

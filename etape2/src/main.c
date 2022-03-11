@@ -12,7 +12,7 @@
 #define DEFAULT_SERVER "193.48.57.48"
 #define DEFAULT_PORT "53"
 #define DEFAULT_STRAT "libDNSinFILE.so"
-#define DEFAULT_INIT "../bin/fichier.txt"
+#define DEFAULT_INIT "fichier.txt"
 #define MAX_SERVER 1024
 #define MAX_PORT 1024
 #define MAX_STRAT 1024
@@ -20,11 +20,11 @@
 char server[MAX_SERVER] = DEFAULT_SERVER, port[MAX_PORT] = DEFAULT_PORT, strategie[MAX_STRAT]= DEFAULT_STRAT, init_args_strategie[MAX_STRAT] = DEFAULT_INIT;
 
 void proxy_dns(int s,unsigned char* requetes,int taille_requetes,struct sockaddr * adresse, int taille){
-	/*
+	#ifdef DEBUG
 	printf("%d\n",taille_requetes);
 	for(int i=0;i<taille_requetes;i++)printf("%x ",requetes[i]);
 	printf("\n");
-	*/
+	#endif
 	logMsg_t* msg = malloc(sizeof(logMsg_t)-1+taille_requetes);
 	msg->size = taille_requetes;
 	memcpy(msg->msg,requetes,taille_requetes);
@@ -35,11 +35,19 @@ void proxy_dns(int s,unsigned char* requetes,int taille_requetes,struct sockaddr
 }
 
 int main(int argc,char * argv[]){
-	int status=args(argc,argv,server,port,strategie,init_args_strategie);
-	loadStrategy(strategie);
-	initStrategy(init_args_strategie);
-	//printf("%s %s\n",server,port);
-	//if(status==-1)return 0;
+	int status = args(argc,argv,server,port,strategie,init_args_strategie);
+	if(status == -1)return 0;
+	#ifdef DEBUG
+	if(status == 0)printf("Args : \nserver : %s\nport : %s\nstratgy : %s\n strategy args : %s\n",server,port,strategie,init_args_strategie);
+	#endif 
+	status = loadStrategy(strategie);
+	#ifdef DEBUG
+	if(status == 0)printf("Lancement de loadStrategy de libgenericLog -> OK\n");
+	#endif 
+	status = initStrategy(init_args_strategie);
+	#ifdef DEBUG
+	if(status == 0)printf("Lancement de initStrategy de libgenericLog -> OK\n");
+	#endif
 	int s=initialisationSocketUDP(port);
 	boucleServeurUDP(s,proxy_dns);
 	close(s);
