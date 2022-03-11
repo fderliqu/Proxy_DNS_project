@@ -14,4 +14,4 @@ $(TARGET): $(OBJS)
 	mv ./*.so ../../dynamic
 
 clean:
-	rm ./*.o
+	rm -f ./*.o

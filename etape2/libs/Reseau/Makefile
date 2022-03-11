@@ -4,7 +4,7 @@
 # Constantes liees au projet
 #
 
-AR=ar crus
+AR=ar crs
 # LDFLAGS=
 TARGET=../static/libreseau.a
 
@@ -20,7 +20,7 @@ all: $(TARGET)
 
 clean:
 	rm -f *.o
-	rm $(TARGET)
+	rm -f $(TARGET)
 
 #
 # Executable

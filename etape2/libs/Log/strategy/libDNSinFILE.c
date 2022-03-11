@@ -16,7 +16,7 @@ int initLog(void * f){
 }
 
 int addLog(logMsg_t * paquet){
-	unsigned char* octet = paquet->msg;
+	unsigned char* octet = (unsigned char *)paquet->msg;
 	for(int i=0;i<paquet->size;i++){
 		fprintf(file,"%02x ",*octet);
 		octet++;
