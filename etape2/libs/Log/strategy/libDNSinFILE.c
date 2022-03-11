@@ -1,3 +1,5 @@
+//Strategie mettre les messages dns recu dans un ficher texte
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>

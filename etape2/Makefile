@@ -1,3 +1,5 @@
+#Makefile principal
+
 MAKE = make
 MAKECLEAN = make clean
 DIRS = libs/Reseau libs/Log libs/Log/strategy src

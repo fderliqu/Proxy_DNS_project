@@ -1,3 +1,5 @@
+#Makefile src
+
 CC=gcc
 LIBDIR = -L ../libs/static -L ../libs/dynamic
 INCDIR = -I ../libs/Reseau -I ../libs/Log
