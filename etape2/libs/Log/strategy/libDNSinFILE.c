@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>
+#include<string.h>
 #include<sys/types.h>
 #include<sys/stat.h>
 #include<fcntl.h>
@@ -15,11 +16,12 @@ int initLog(void * f){
 }
 
 int addLog(logMsg_t * paquet){
-	char* octet = paquet->msg;
+	unsigned char* octet = paquet->msg;
 	for(int i=0;i<paquet->size;i++){
 		fprintf(file,"%02x ",*octet);
 		octet++;
 	}
-	printf("\n");
+	fprintf(file,"\n");
+	fflush(file);
 	return 0;
 }
