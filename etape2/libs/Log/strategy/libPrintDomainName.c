@@ -21,16 +21,19 @@ int addLog(logMsg_t * paquet){
 	printf("opcode : %x\n", *octet);
 	#endif
 
-	if (*octet && 0x78 == 0x00)  //on teste si opcode == 0
+	#ifdef DEBUG
+	printf("test : %x\n", (*octet & 0x78));
+	#endif
+	if ((*octet & 0x78) == 0x00)  //on teste si opcode == 0
 	{
-		octet += 10; //on pointe sur le premier octet du QNAME
+		octet += 11; //on pointe sur le premier octet donnant le nom de domaine du QNAME
 		#ifdef DEBUG
 		printf("first element in QNAME :%x\n", *octet);
 		#endif
-
 		while (*octet != 0x00)
 		{
 			printf("%c", *octet);
+			if (*octet < 32) printf("."); //si code ascii système on a remarqué que c'était en réalité un point
 			octet ++;
 		}
 		printf("\n");
