@@ -11,6 +11,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CC) -shared libDNSinFILE.o -o libDNSinFILE.so
+	$(CC) -shared libPrintDomainName.o -o libPrintDomainName.so
 	mv ./*.so ../../dynamic
 
 clean:

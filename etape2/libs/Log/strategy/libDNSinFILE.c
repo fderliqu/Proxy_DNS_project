@@ -13,7 +13,11 @@ FILE * file;
 
 int initLog(void * f){
 	file = fopen ((char *)f,"w");
-	if(file==NULL)exit(-1);
+	if(file==NULL)
+	{
+		printf("Le fichier n'a pas pu être ouvert.\n");
+		exit(-1);
+	}
 	return 0;
 }
 

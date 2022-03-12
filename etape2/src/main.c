@@ -13,7 +13,7 @@
 
 #define DEFAULT_SERVER "193.48.57.48"
 #define DEFAULT_PORT "53"
-#define DEFAULT_STRAT "libDNSinFILE.so"
+#define DEFAULT_STRAT "libPrintDomainName.so"
 #define DEFAULT_INIT "fichier.txt"
 #define MAX_SERVER 1024
 #define MAX_PORT 1024
