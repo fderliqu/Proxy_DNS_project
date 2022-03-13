@@ -42,18 +42,24 @@ void proxy_dns(int s,unsigned char* requetes,int taille_requetes,struct sockaddr
 int main(int argc,char * argv[]){
 	int status = args(argc,argv,server,port,strategie,init_args_strategie);
 	if(status == -1)return 0;
+
 	#ifdef DEBUG
 	if(status == 0)printf("Args : \nserver : %s\nport : %s\nstratgy : %s\n strategy args : %s\n",server,port,strategie,init_args_strategie);
 	#endif
+
 	status = loadStrategy(strategie);
        	if(status == -1)printf("Erreur Loggin : La startégie n'a pas pu être lancée ou aucune stratégie n'a été mis en paramètre -> Lancement du programme sans stratégie de loggin\n");	
+	
 	#ifdef DEBUG
 	if(status == 0)printf("Lancement de loadStrategy de libgenericLog -> OK\n");
 	#endif 
+
 	if( strcmp(strategie,DEFAULT_STRAT) != 0 )status = initStrategy(init_args_strategie);
+	
 	#ifdef DEBUG
 	if(status == 0)printf("Lancement de initStrategy de libgenericLog -> OK\n");
 	#endif
+	
 	int s=initialisationSocketUDP(port);
 	boucleServeurUDP(s,proxy_dns);
 	close(s);
