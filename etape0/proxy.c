@@ -6,8 +6,8 @@
 #include<sys/types.h>
 #include<sys/socket.h>
 #include<netdb.h>
-#include"../dns.h"
-#include"../dns_server.h"
+#include"./dns.h"
+#include"./dns_server.h"
 
 #include"dns_etape0.h"
 
@@ -113,9 +113,9 @@ int main(void){
 	//boucleServeurUDP(s,sendmsgUDP);
 	while(1){
 		struct sockaddr_storage adresse;
-//		struct sockaddr_storage adresseREP;
+		struct sockaddr_storage adresseREP;
   		socklen_t taille=sizeof(adresse);
-	//	socklen_t tailleREP=sizeof(adresseREP);
+		socklen_t tailleREP=sizeof(adresseREP);
   		unsigned char message[DNS_UDP_MAX_PACKET_SIZE];
   		int nboctets=recvfrom(s,message,DNS_UDP_MAX_PACKET_SIZE,0,(struct sockaddr *)&adresse,&taille);
 		messageUDP(NAMESERVER_MATHSINFO,"53",message,nboctets);
