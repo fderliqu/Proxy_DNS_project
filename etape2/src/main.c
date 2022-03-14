@@ -15,7 +15,7 @@
 #define DEFAULT_SERVER "193.48.57.48"
 #define DEFAULT_PORT "53"
 #define DEFAULT_STRAT "none"
-#define DEFAULT_INIT "fichier.txt"
+#define DEFAULT_INIT "default_output.txt"
 #define MAX_SERVER 1024
 #define MAX_PORT 1024
 #define MAX_STRAT 1024
