@@ -20,4 +20,5 @@ $(TARGET): main.o args.o
 clean:
 	rm -f *.o
 	rm -f $(TARGET)
+	rm -f ../*.txt
 
