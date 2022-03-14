@@ -8,5 +8,5 @@ typedef struct logMsg_s {
 
 int initLog(void *);
 int addLog(logMsg_t *);
-
+int endLog();
 #endif

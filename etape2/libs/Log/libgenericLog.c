@@ -40,3 +40,16 @@ int logStrategy(logMsg_t * msg){
 	(*addLog)(msg);
 	return 0;
 }
+
+int endStrategy(void * f){
+	char *error;
+	int (*endLog)(void *);
+	endLog = dlsym(handle,"endLog");
+	if ((error = dlerror()) != NULL)  {
+      		return -1;
+	}
+	(*endLog)(f);
+	dlclose(handle);
+	return 0;
+}
+	

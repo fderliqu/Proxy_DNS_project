@@ -21,11 +21,14 @@ int args(int argc, char * argv[],char * server, char * port, char * strategie, c
 		if(opt == -1)break;
 		switch(opt){
 			case 'h':
-				printf("-h et --help : affiche le message d'aide du programme qui explique toutes les options possibles \n\
-					-p PORT et --port=PORT : permet de modifier le port par défaut (53) utilisé par le programme pour recevoir les questions DNS\n\
-					-s SERVEUR et --serveur=SERVEUR : permet de spécifier un serveur DNS particulier à la place du serveur DNS par défaut\n\
-					-l STRATEGIE et --logstrategy=STRATEGIE : permet de choisir la stratégie à charger (DNSinFILE/1 or PrintDomainName/2) \n\
-					-i INIT_ARGS_STRATEGIE et --initlogstrategie=INIT_ARGS_STRATEGIE : permet de passer des paramètres d'initialisation à la stratégie choisie\n");
+				printf("SYNOPSIS\n\tproxydns [OPTIONS]\nDESCRIPTION\n");
+				printf("\t-h et --help : affiche le message d'aide du programme qui explique toutes les options possibles\n");
+				printf("\t-p PORT et --port=PORT : permet de modifier le port par défaut (53) utilisé par le programme pour recevoir les questions DNS\n");
+				printf("\t-s SERVEUR et --serveur=SERVEUR : permet de spécifier un serveur DNS particulier à la place du serveur DNS par défaut\n");
+				printf("\t-l STRATEGIE et --logstrategy=STRATEGIE : permet de choisir la stratégie à charger (DNSinFILE/1 or PrintDomainName/2)\n");
+				printf("\t-i INIT_ARGS_STRATEGIE et --initlogstrategie=INIT_ARGS_STRATEGIE : permet de passer des paramètres d'initialisation à la stratégie choisie\n");
+				printf("EXAMPLE\n\t<path>/proxydns -p 53 -s 193.48.57.48 -l 2 -i fichier.txt\n\t<path>/proxydns --port=53 --serveur=193.48.57.48 -l PrintDNSinFILE -i fichier.txt\n\n");
+
 				return -1;
 
 			case 'p':

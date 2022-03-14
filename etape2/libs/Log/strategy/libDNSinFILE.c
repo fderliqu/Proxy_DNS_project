@@ -32,4 +32,7 @@ int addLog(logMsg_t * paquet){
 	return 0;
 }
 
-
+int endLog(){
+	fclose(file);
+	return 0;
+}

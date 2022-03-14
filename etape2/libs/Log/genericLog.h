@@ -6,6 +6,7 @@
 int loadStrategy(char *);
 int initStrategy(void *);
 int logStrategy(logMsg_t *);
+int endStrategy();
 
 
 #endif

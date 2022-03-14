@@ -1,6 +1,7 @@
 //Main.c
 
 #include<stdio.h>
+#include<signal.h>
 #include<stdlib.h>
 #include<unistd.h>
 #include<dlfcn.h>
@@ -20,7 +21,14 @@
 #define MAX_STRAT 1024
 
 char server[MAX_SERVER] = DEFAULT_SERVER, port[MAX_PORT] = DEFAULT_PORT, strategie[MAX_STRAT]= DEFAULT_STRAT, init_args_strategie[MAX_STRAT] = DEFAULT_INIT;
-
+/*
+void fn(void * k){
+	printf("KILL BY SIGINT, CLOSE EVERYTHING PROPERLY\n");
+	close(socket);
+	if( strcmp(strategie,DEFAULT_STRAT) != 0 )endStrategy();
+	return;
+}
+*/
 void proxy_dns(int s,unsigned char* requetes,int taille_requetes,struct sockaddr * adresse, int taille){
 	#ifdef DEBUG
 	printf("Message recu : \n-> ");
@@ -59,10 +67,11 @@ int main(int argc,char * argv[]){
 	#ifdef DEBUG
 	if(status == 0)printf("Lancement de initStrategy de libgenericLog -> OK\n");
 	#endif
-	
+	//signal(SIGINT,fn);
 	int s=initialisationSocketUDP(port);
 	boucleServeurUDP(s,proxy_dns);
 	close(s);
+	endStrategy();
 	return 0;
 }
 
