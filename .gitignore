@@ -1,0 +1,19 @@
+# Object files
+*.o
+*.obj
+
+# Libraries
+*.lib
+*.a
+
+# Shared objects 
+*.so
+*.so.*
+
+# Executables
+*.exe
+*.out
+*.hex
+
+# Output file
+*.txt

@@ -10,9 +10,8 @@
 #include"../log_dns.h"
 
 #define GoTo_BYTE2 2
-#define GoTo_QNAME 11
+#define GoTo_QNAME 10
 #define MASK_OPCODE 0x78 //0b01111000 masque pour tester l'opcode
-#define INT_FIRST_PRINTABLE_ASCII_CODE 31
 
 int initLog(void * f){
 	//Cette fonction est inutile pour cette stratégie mais il faut quand même la définir, cette fonction ne fera rien, le code sert juste à eviter le warning dans la compilation
@@ -37,12 +36,21 @@ int addLog(logMsg_t * paquet){
 		#ifdef DEBUG
 		printf("first element in QNAME :%x\n", *octet);
 		#endif
+
 		printf("Message reçu de ");
+
+		int cpt=0; //Compteur et test de fin
 		while (*octet != 0x00) //RFC1035 : Le QNAME se termine par le caractère NUL de code ascii 0
 		{
-			printf("%c", *octet);
-			if (*octet < INT_FIRST_PRINTABLE_ASCII_CODE) printf("."); //si code ascii est une commande de controle de terminal on a remarqué que c'était en réalité un point, pour afficher le point, nous affichons un /'./' au lieu du caractère non imprimable
-			octet++; //On passe l'octet suivant
+			cpt=*octet; //Le nombre de caractère dans le groupe de caractères
+			octet++;
+			for (int i=0; i < cpt; i++)
+			{
+				printf("%c", *octet);
+				octet++;
+			}
+
+			if ((*octet) != 0x00) printf("."); //Fin du groupe de caractère
 		}
 		printf("\n");
 	}
