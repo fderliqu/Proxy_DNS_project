@@ -93,6 +93,15 @@ void * log_thread(void * arg){
 	logMsg_t* msg = malloc(sizeof(logMsg_t)-1+taille_msg);
 	msg->size = taille_msg;
 	memcpy(msg->msg,tampon,taille_msg);
+	if(dbg){
+		printf("message on log thread: ");
+		unsigned char* octet = (unsigned char *)msg->msg;
+		for(int i=0;i<msg->size;i++){
+			printf("%02x ",*octet);
+			octet++;
+		}
+		printf("\n");
+	}
 	if(strcmp(strategie,DEFAULT_STRAT) != 0){
 		int status = logStrategy(msg);
 		if(status == -1)exit(-1);
@@ -103,11 +112,11 @@ void * log_thread(void * arg){
 
 void * proxy_thread(void * arg){
 	#ifdef DEBUG
-	printf("Est dans la fonction thrread_fct\n");
+	printf("Est dans la fonction proxy_fct\n");
 	#endif
 	arg_t * args = arg;
 	#ifdef DEBUG
-	printf("message = ");
+	printf("message on proxy thread = ");
 	for(int i=0;i<args->taille_msg;i++){
 		printf("%02x ",args->msg[i]);
 	}
@@ -120,20 +129,11 @@ void * proxy_thread(void * arg){
 
 void proxy_dns(int s, unsigned char* message, int taille_message, struct sockaddr * adresse, int taille){
 	arg_t arg;
-	if(DEBUG)printf("attach s\n");
 	arg.s = s;
-	if(DEBUG)printf("attach msg\n");
 	memcpy(arg.msg,message,taille_message);
-	if(DEBUG)printf("attach taille msg\n");
 	arg.taille_msg = taille_message;
-	if(DEBUG)printf("attach addr\n");
 	memcpy(&arg.adresse,adresse,taille);
-	//memcpy(arg->adresse,adresse,sizeof(struct sockaddr));
-	if(DEBUG)printf("attach addr taille\n");
 	arg.taille = taille;
-	#ifdef DEBUG
-		printf("On proxy_dns : %d %d %d \n",arg.s,arg.taille_msg,arg.taille);
-	#endif
 	int status = launchThread(proxy_thread,&arg,sizeof(arg_t));
 	if(status != 0){
 		printf("Erreur : changement du thread dns\n");
