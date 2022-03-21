@@ -99,7 +99,7 @@ size_t availableMemory(void)
 	size_t size;
 
 	if (memory.full) size = 0;
-	if (memory.head >= memory.tail)
+	if (memory.head > memory.tail)
 	{
 		size = memory.head - memory.tail;
 	}
