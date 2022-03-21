@@ -89,24 +89,30 @@ void * log_thread(void * arg){
 	if(arg != NULL)return NULL;
 	if(dbg)printf("Dans fonction log thread\n");
 	u_int8_t taille_msg;
-	void * tampon = readMemory(&taille_msg);
-	logMsg_t* msg = malloc(sizeof(logMsg_t)-1+taille_msg);
-	msg->size = taille_msg;
-	memcpy(msg->msg,tampon,taille_msg);
-	if(dbg){
-		printf("message on log thread: ");
-		unsigned char* octet = (unsigned char *)msg->msg;
-		for(int i=0;i<msg->size;i++){
-			printf("%02x ",*octet);
-			octet++;
+	void * tampon;
+	while(1){
+		while(memoryIsEmpty()){
+			sleep(1);
 		}
-		printf("\n");
+		tampon = readMemory(&taille_msg);
+		logMsg_t* msg = malloc(sizeof(logMsg_t)-1+taille_msg);
+		msg->size = taille_msg;
+		memcpy(msg->msg,tampon,taille_msg);
+		if(dbg){
+			printf("message on log thread: ");
+			unsigned char* octet = (unsigned char *)msg->msg;
+			for(int i=0;i<msg->size;i++){
+				printf("%02x ",*octet);
+				octet++;
+			}
+			printf("\n");
+		}
+		if(strcmp(strategie,DEFAULT_STRAT) != 0){
+			int status = logStrategy(msg);
+			if(status == -1)exit(-1);
+		}
+		free(msg);
 	}
-	if(strcmp(strategie,DEFAULT_STRAT) != 0){
-		int status = logStrategy(msg);
-		if(status == -1)exit(-1);
-	}
-	free(msg);
 	return NULL;
 }
 
