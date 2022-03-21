@@ -26,7 +26,7 @@ circ_buff_t memory;
 
 int allocateMemory(size_t size)
 {
-	if(dbg)printf("Entre fonction allocateMem");
+	if(dbg)printf("Entre fonction allocateMem\n");
 	memory.buffer = malloc(size);
 	memory.max = size;
 	circ_buff_reset();
@@ -37,7 +37,8 @@ int allocateMemory(size_t size)
 
 int writeMemory(void *data, u_int8_t size)
 {
-	if(dbg)printf("Entre fonction writeMem");
+	if(dbg)printf("Entre fonction writeMem head : %ld tail : %ld\n",memory.head,memory.tail);
+
 	if ((int)availableMemory() < size) return -1; //il n'y a pas assez de place dans la mémoire
 
 	u_int8_t *p = data;
@@ -54,12 +55,14 @@ int writeMemory(void *data, u_int8_t size)
 		p++;
 		advance_head();
 	}
+	if(dbg)printf("Fin fonction writeMem head : %ld tail : %ld\n",memory.head,memory.tail);
 	return 0;
 }
 
 void *readMemory(u_int8_t *size)
 {
-	if(dbg)printf("Entre fonction readMem");
+	if(dbg)printf("Entre fonction readMem head : %ld tail : %ld\n",memory.head,memory.tail);
+	
 	static u_int8_t tampon[MAX_TAMPON];  //static pour ne pas avoir à free
 
 	u_int8_t taille = (int)memory.buffer[memory.tail];
@@ -71,6 +74,7 @@ void *readMemory(u_int8_t *size)
 		tampon[i] = memory.buffer[i]; // "+ 1" car on ignore l'octet signifiant la taille
 		advance_tail();
 	}
+	if(dbg)printf("Fin fonction readMem head : %ld tail : %ld\n",memory.head,memory.tail);
 
 	return &(tampon);
 }
