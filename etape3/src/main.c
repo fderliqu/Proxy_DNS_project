@@ -11,6 +11,7 @@
 #include"dns_server.h"
 #include"reseau.h"
 #include"args.h"
+#include"thread.h"
 
 #define DEFAULT_SERVER "193.48.57.48"
 #define DEFAULT_PORT "53"
@@ -44,7 +45,7 @@ void fn(){
 
 	exit(-1);
 }
-
+/*
 void proxy_dns(int s,unsigned char* requetes,int taille_requetes,struct sockaddr * adresse, int taille){
 
 	#ifdef DEBUG
@@ -64,6 +65,39 @@ void proxy_dns(int s,unsigned char* requetes,int taille_requetes,struct sockaddr
 	int nboctets = messageUDP(server,port,requetes,taille_requetes);//Envoie du message vers le serveur DNS et réception de la réponse
         sendto(s,requetes,nboctets,0,adresse,taille);//Envoie de la réponse vers le client initial
 }
+*/
+
+void * fct_thread(void * arg){
+	#ifdef DEBUG
+	printf("Est dans la fonction thrread_fct");
+	#endif
+	unsigned char * octet;
+	octet = ((arg_t *)arg)->msg;
+#ifdef DEBUG
+	printf("%c",*octet);
+#endif
+	/*
+	int nboctets = messageUDP(server,port,requetes,taille_requetes);//Envoie du message vers le serveur DNS et réception de la réponse
+        sendto(s,requetes,nboctets,0,adresse,taille);//Envoie de la réponse vers le client initial
+*/
+	return NULL;
+}
+
+void proxy_dns(int s, unsigned char* message, int taille_message, struct sockaddr * adresse, int taille){
+	int argSize = sizeof(arg_t)-1+taille_message;
+	arg_t * arg = malloc(argSize);
+	arg->s = s;
+	memcpy(arg->msg,message,taille_message);
+	arg->taille_msg = taille_message;
+	memcpy(arg->adresse,adresse,sizeof(struct sockaddr));
+	arg->taille = taille;
+	#ifdef DEBUG
+		printf("On proxy_dns : %d %d %d \n",arg->s,arg->taille_msg,arg->taille);
+	#endif
+	launchThread(fct_thread,(void *)arg,argSize);
+	free(arg);
+}
+
 
 int main(int argc,char * argv[]){
 	int status = args(argc,argv,server,port,strategie,init_args_strategie); //Réception des arguments
