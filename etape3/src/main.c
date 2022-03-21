@@ -84,7 +84,7 @@ void * fct_thread(void * arg){
 }
 
 void proxy_dns(int s, unsigned char* message, int taille_message, struct sockaddr * adresse, int taille){
-	int argSize = sizeof(arg_t)-1+taille_message;
+	int argSize = sizeof(arg_t)-1+taille_message+sizeof(struct sockaddr);
 	arg_t * arg = malloc(argSize);
 	arg->s = s;
 	memcpy(arg->msg,message,taille_message);
