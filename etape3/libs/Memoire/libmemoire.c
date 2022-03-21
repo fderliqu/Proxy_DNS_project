@@ -3,18 +3,7 @@
 #include <stdlib.h>
 #include "memoire.h"
 
-#define MAX_TAMPON 256
-
-typedef struct circ_buff_s {
-	u_int8_t * buffer;
-	size_t head;
-	size_t tail;
-	size_t max;
-	bool full; 
-} circ_buff_t;
-
-circ_buff_t memory;
-static u_int8_t tampon; //pour fonction read memory
+//static u_int8_t tampon; //pour fonction read memory
 
 int allocateMemory(size_t size)
 {
@@ -44,6 +33,7 @@ int writeMemory(void *data, u_int8_t size)
 		p++;
 		advance_head();
 	}
+	return 0;
 }
 
 void *readMemory(u_int8_t *size)
@@ -100,22 +90,16 @@ size_t availableMemory(void)
 
 void advance_head()
 {
-	if (memoryIsFull())
-	{
-		memory.head ++;
-		if (memory.head == memory.max) memory.head = 0;
-	}
-
+	//if (memoryIsFull()){
+	memory.head ++;
+	if (memory.head == memory.max) memory.head = 0;
 	memory.full = (memory.head == memory.tail);
 }
 
 void advance_tail()
 {
-	if (memoryIsFull())
-	{
+	//if (memoryIsFull())
 		memory.tail ++;
 		if (memory.tail == memory.max) memory.tail = 0;
-	}
-
-	memory.full = (memory.tail == memory.tail);
+	//memory.full = (memory.tail == memory.tail);
 }

@@ -2,8 +2,8 @@
 
 CC=gcc
 LIBDIR = -L ../libs/static -L ../libs/dynamic
-INCDIR = -I ../libs/Reseau -I ../libs/Log -I ../libs/Threads
-BIBLIO = -lreseau -lgenericLog -ldl -lpthread -lthread
+INCDIR = -I ../libs/Reseau -I ../libs/Log -I ../libs/Threads -I ../libs/Memoire
+BIBLIO = -lreseau -lgenericLog -ldl -lpthread -lthread -lmemoire
 TARGET = ../bin/proxydns
 
 all: $(TARGET)
