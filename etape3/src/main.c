@@ -20,10 +20,24 @@
 #define MAX_SERVER 1024
 #define MAX_PORT 1024
 #define MAX_STRAT 1024
+#ifndef DEBUG
+int dbg = 0;
+#endif
+#ifdef DEBUG
+	int dbg = 1;
+#endif
 
 char server[MAX_SERVER] = DEFAULT_SERVER, port[MAX_PORT] = DEFAULT_PORT, strategie[MAX_STRAT]= DEFAULT_STRAT, init_args_strategie[MAX_STRAT] = DEFAULT_INIT;
 
 int s; //La socket de lecture en global pour l'utiliser dans la fonction handler de signal (fonction fn)
+
+typedef struct arg_s{
+	int s;
+	unsigned char msg[DNS_UDP_MAX_PACKET_SIZE];
+	int taille_msg;
+	struct sockaddr_storage adresse;
+	int taille;
+}arg_t;
 
 //Fonction handler pour la réception du signal d'arrêt
 void fn(){
@@ -36,7 +50,7 @@ void fn(){
 	#ifdef DEBUG
 	printf("Arrêt du socket de réception = succès\n");
 	#endif
-
+	
 	if( strcmp(strategie,DEFAULT_STRAT) != 0 )endStrategy(); //Arrêt de la biblio de stratégie
 
 	#ifdef DEBUG
@@ -67,35 +81,40 @@ void proxy_dns(int s,unsigned char* requetes,int taille_requetes,struct sockaddr
 }
 */
 
-void * fct_thread(void * arg){
+void * proxy_thread(void * arg){
 	#ifdef DEBUG
-	printf("Est dans la fonction thrread_fct");
+	printf("Est dans la fonction thrread_fct\n");
 	#endif
-	unsigned char * octet;
-	octet = ((arg_t *)arg)->msg;
-#ifdef DEBUG
-	printf("%c",*octet);
-#endif
-	/*
-	int nboctets = messageUDP(server,port,requetes,taille_requetes);//Envoie du message vers le serveur DNS et réception de la réponse
-        sendto(s,requetes,nboctets,0,adresse,taille);//Envoie de la réponse vers le client initial
-*/
+	arg_t * args = arg;
+	#ifdef DEBUG
+	printf("message = ");
+	for(int i=0;i<args->taille_msg;i++){
+		printf("%02x ",args->msg[i]);
+	}
+	#endif
+	int nboctets = messageUDP(server,port,args->msg,args->taille_msg);//Envoie du message vers le serveur DNS et réception de la réponse
+        sendto(s,args->msg,nboctets,0,(struct sockaddr *)&args->adresse,args->taille);//Envoie de la réponse vers le client initial
 	return NULL;
 }
 
 void proxy_dns(int s, unsigned char* message, int taille_message, struct sockaddr * adresse, int taille){
-	int argSize = sizeof(arg_t)-1+taille_message+sizeof(struct sockaddr);
-	arg_t * arg = malloc(argSize);
-	arg->s = s;
-	memcpy(arg->msg,message,taille_message);
-	arg->taille_msg = taille_message;
-	memcpy(arg->adresse,adresse,sizeof(struct sockaddr));
-	arg->taille = taille;
+	arg_t arg;
+	if(DEBUG)printf("attach s\n");
+	arg.s = s;
+	if(DEBUG)printf("attach msg\n");
+	memcpy(arg.msg,message,taille_message);
+	if(DEBUG)printf("attach taille msg\n");
+	arg.taille_msg = taille_message;
+	if(DEBUG)printf("attach addr\n");
+	memcpy(&arg.adresse,adresse,taille);
+	//memcpy(arg->adresse,adresse,sizeof(struct sockaddr));
+	if(DEBUG)printf("attach addr taille\n");
+	arg.taille = taille;
 	#ifdef DEBUG
-		printf("On proxy_dns : %d %d %d \n",arg->s,arg->taille_msg,arg->taille);
+		printf("On proxy_dns : %d %d %d \n",arg.s,arg.taille_msg,arg.taille);
 	#endif
-	launchThread(fct_thread,(void *)arg,argSize);
-	free(arg);
+	launchThread(proxy_thread,&arg,sizeof(arg_t));
+	if(DEBUG)printf("test\n");
 }
 
 

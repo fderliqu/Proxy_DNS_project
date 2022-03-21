@@ -4,34 +4,42 @@
 #include<string.h>
 #include"thread.h"
 
+#ifdef DEBUG
+	int debug = 1;
+#endif
+#ifndef DEBUG
+	int debug = 0;
+#endif
+
 #ifdef SEMAPHORE
 pthread_mutex_t myMutex;
 #endif
 
-void * fct_Thread(void * arg){
-	void * void_arg = ((arg_thread_t *)arg)->arg;
-	arg_t * arg_s = (arg_t *)void_arg;
-	//memcpy(&args,((arg_thread_t *)arg)->arg,sizeof(((arg_thread_t *)arg)->argSize));
-#ifdef DEBUG
-	printf("On fct_thread : %d %d %d \n",arg_s->s,arg_s->taille_msg,arg_s->taille);
-#endif
-	free(arg);
+static void * fct_Thread(void * arg){
+	arg_thread_t * args = arg;
+	args->fct(args->arg);
+	free(args->arg);
+	free(args);
 	return 0;
 }
 
 int launchThread(void *(*fct)(void *),void * arg, size_t argSize){
-	#ifdef SEMAPHORE
+	
+#ifdef SEMAPHORE
 		pthread_mutex_init(&myMutex,NULL);
-	#endif
+	
+#endif
 
-	arg_thread_t * args = malloc(sizeof(struct arg_thread_s) + argSize);
+	if(debug)printf("entre lauchthread\n");
+	arg_thread_t * args = malloc(sizeof(arg_thread_t));
 	if(arg != NULL){
+		args->arg = malloc(argSize);
 		memcpy(args->arg,arg,argSize);
 	}
 	else args->arg = NULL;
 	args->fct = fct;
 	pthread_t tid;
-	int status = pthread_create(&tid,NULL,fct_Thread,(void *)args);
+	int status = pthread_create(&tid,NULL,fct_Thread,args);
 	if(status != 0)return -1;
 	pthread_detach(tid);
 	return 0;
