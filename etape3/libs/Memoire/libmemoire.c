@@ -5,8 +5,28 @@
 
 //static u_int8_t tampon; //pour fonction read memory
 
+#define MAX_TAMPON 256
+
+#ifdef DEBUG
+int dbg = 1;
+#endif
+#ifndef DEBUG
+int dbg = 0;
+#endif
+
+typedef struct circ_buff_s {
+	u_int8_t * buffer;
+	size_t head;
+	size_t tail;
+	size_t max;
+	bool full;
+} circ_buff_t;
+
+circ_buff_t memory;
+
 int allocateMemory(size_t size)
 {
+	if(dbg)printf("Entre fonction allocateMem");
 	memory.buffer = malloc(size);
 	memory.max = size;
 	circ_buff_reset();
@@ -17,6 +37,7 @@ int allocateMemory(size_t size)
 
 int writeMemory(void *data, u_int8_t size)
 {
+	if(dbg)printf("Entre fonction writeMem");
 	if ((int)availableMemory() < size) return -1; //il n'y a pas assez de place dans la mémoire
 
 	u_int8_t *p = data;
@@ -38,6 +59,7 @@ int writeMemory(void *data, u_int8_t size)
 
 void *readMemory(u_int8_t *size)
 {
+	if(dbg)printf("Entre fonction readMem");
 	static u_int8_t tampon[MAX_TAMPON];  //static pour ne pas avoir à free
 
 	u_int8_t taille = (int)memory.buffer[memory.tail];

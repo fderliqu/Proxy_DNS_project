@@ -11,14 +11,3 @@ void circ_buff_reset();
 void advance_head();
 void advance_tail();
 
-#define MAX_TAMPON 256
-
-typedef struct circ_buff_s {
-	u_int8_t * buffer;
-	size_t head;
-	size_t tail;
-	size_t max;
-	bool full; 
-} circ_buff_t;
-
-circ_buff_t memory;
