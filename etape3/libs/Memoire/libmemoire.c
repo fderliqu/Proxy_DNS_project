@@ -72,8 +72,8 @@ void *readMemory(u_int8_t *size)
 	if(dbg)printf("copie de tanpon : ");
 	for (int i=0; i<taille; i++)
 	{
-		tampon[i] = memory.buffer[i]; // "+ 1" car on ignore l'octet signifiant la taille
-		if(dbg)printf("%02x ",memory.buffer[i]);
+		tampon[i] = memory.buffer[memory.tail]; // "+ 1" car on ignore l'octet signifiant la taille
+		if(dbg)printf("%02x ",memory.buffer[memory.tail]);
 		advance_tail();
 	}
 	if(dbg)printf("\nFin fonction readMem head : %ld tail : %ld\n",memory.head,memory.tail);
