@@ -63,39 +63,22 @@ void fn(){
 
 	exit(-1);
 }
-/*
-void proxy_dns(int s,unsigned char* requetes,int taille_requetes,struct sockaddr * adresse, int taille){
 
-	#ifdef DEBUG
-	printf("Message recu : \n-> ");
-	for(int i=0;i<taille_requetes;i++)printf("%x ",requetes[i]);
-	printf("\n");
-	#endif
-
-	logMsg_t* msg = malloc(sizeof(logMsg_t)-1+taille_requetes); //Allocation de la taille nécéssaire de la structure logmsg_t
-	msg->size = taille_requetes;
-	memcpy(msg->msg,requetes,taille_requetes);
-	if( strcmp( strategie, DEFAULT_STRAT) != 0){ //On lance logStrategy si et seulement l'utilisateur à spécifier une stratégie
-		int status = logStrategy(msg);
-		if(status == -1)exit(-1);
-	}
-	free(msg);
-	int nboctets = messageUDP(server,port,requetes,taille_requetes);//Envoie du message vers le serveur DNS et réception de la réponse
-        sendto(s,requetes,nboctets,0,adresse,taille);//Envoie de la réponse vers le client initial
-}
-*/
+//Fonction thread de log
 
 void * log_thread(void * arg){
-	if(arg != NULL)return NULL;
+	if(arg != NULL)return NULL; //Pour éviter le warning unused variable
 	if(dbg)printf("Dans fonction log thread\n");
 	u_int8_t taille_msg;
 	void * tampon;
 	while(1){
+		//boucle infinie si la mémoire est vide, on ne lit pas
 		while(memoryIsEmpty()){
 			sleep(1);
 		}
+		//Arrivée d'un write, donc lecture
 		tampon = readMemory(&taille_msg);
-		logMsg_t* msg = malloc(sizeof(logMsg_t)-1+taille_msg);
+		logMsg_t* msg = malloc(sizeof(logMsg_t)-1+taille_msg);//Création de log_msg_t
 		msg->size = taille_msg;
 		memcpy(msg->msg,tampon,taille_msg);
 		if(dbg){
@@ -107,6 +90,7 @@ void * log_thread(void * arg){
 			}
 			printf("\n");
 		}
+		//Lancement de la logStrat
 		if(strcmp(strategie,DEFAULT_STRAT) != 0){
 			int status = logStrategy(msg);
 			if(status == -1)exit(-1);
@@ -117,32 +101,35 @@ void * log_thread(void * arg){
 }
 
 void * proxy_thread(void * arg){
-	#ifdef DEBUG
-	printf("Est dans la fonction proxy_fct\n");
-	#endif
 	arg_t * args = arg;
 	#ifdef DEBUG
+	printf("Est dans la fonction proxy_fct\n");
 	printf("message on proxy thread = ");
 	for(int i=0;i<args->taille_msg;i++){
 		printf("%02x ",args->msg[i]);
 	}
+	printf("\n");
 	#endif
-	writeMemory(args->msg,args->taille_msg);
+	//Ecriture vers la mémoire
+	int status = writeMemory(args->msg,args->taille_msg);
+	if(dbg)printf("status = %d\n",status);
 	int nboctets = messageUDP(server,port,args->msg,args->taille_msg);//Envoie du message vers le serveur DNS et réception de la réponse
         sendto(s,args->msg,nboctets,0,(struct sockaddr *)&args->adresse,args->taille);//Envoie de la réponse vers le client initial
 	return NULL;
 }
 
 void proxy_dns(int s, unsigned char* message, int taille_message, struct sockaddr * adresse, int taille){
+	//Stockage des arguments
 	arg_t arg;
 	arg.s = s;
 	memcpy(arg.msg,message,taille_message);
 	arg.taille_msg = taille_message;
 	memcpy(&arg.adresse,adresse,taille);
 	arg.taille = taille;
+	//Lancement thread de proxy
 	int status = launchThread(proxy_thread,&arg,sizeof(arg_t));
 	if(status != 0){
-		printf("Erreur : changement du thread dns\n");
+		printf("Erreur : changement du thread proxy\n");
 		exit(-1);
 	}
 }
@@ -174,8 +161,10 @@ int main(int argc,char * argv[]){
 
 	signal(SIGINT,fn);//Création du signal
 	s = initialisationSocketUDP(port); //Création socket de lecture
+	//Allocation de la mémoire de partage
 	size_t size = 256;
 	status = allocateMemory(size);
+	//Lancement du thread de log
 	status = launchThread(log_thread,NULL,0);
 	if(status != 0){
 		printf("Erreur chargement du thread log");

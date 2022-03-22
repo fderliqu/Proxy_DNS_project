@@ -11,10 +11,6 @@
 	int debug = 0;
 #endif
 
-#ifdef SEMAPHORE
-pthread_mutex_t myMutex;
-#endif
-
 static void * fct_Thread(void * arg){
 	arg_thread_t * args = arg;
 	args->fct(args->arg);
@@ -24,12 +20,6 @@ static void * fct_Thread(void * arg){
 }
 
 int launchThread(void *(*fct)(void *),void * arg, size_t argSize){
-	
-#ifdef SEMAPHORE
-		pthread_mutex_init(&myMutex,NULL);
-	
-#endif
-
 	if(debug)printf("entre lauchthread\n");
 	arg_thread_t * args = malloc(sizeof(arg_thread_t));
 	if(arg != NULL){
