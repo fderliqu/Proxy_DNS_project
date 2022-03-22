@@ -35,7 +35,7 @@ int allocateMemory(size_t size)
 
 int writeMemory(void *data, u_int8_t size)
 {
-	if(dbg)printf("\nDébut fonction writeMem head : %ld tail : %ld size msg : %d",memory.head,memory.tail,size);
+	if(dbg)printf("\nDébut fonction writeMem head : %ld / tail : %ld / size msg : %d / size memory max : %ld \n",memory.head,memory.tail,size, memory.max);
 
 	if ((int)availableMemory() < size) return -1; //il n'y a pas assez de place dans la mémoire
 
@@ -52,13 +52,13 @@ int writeMemory(void *data, u_int8_t size)
 		p++;
 		advance_head();
 	}
-	if(dbg)printf("Fin fonction writeMem head : %ld / tail : %ld / mémoire restante : %ld \n",memory.head,memory.tail, availableMemory());
+	if(dbg)printf("Fin fonction writeMem head : %ld / tail : %ld / mémoire restante : %ld / full ? %i \n",memory.head,memory.tail, availableMemory(), memory.full);
 	return 0;
 }
 
 void *readMemory(u_int8_t *size)
 {
-	if(dbg)printf("\nDébut fonction readMem head : %ld tail : %ld\n",memory.head,memory.tail);
+	if(dbg)printf("\nDébut fonction readMem head : %ld / tail : %ld\n",memory.head,memory.tail);
 	
 	if (memoryIsEmpty())
 	{
@@ -70,7 +70,7 @@ void *readMemory(u_int8_t *size)
 
 	u_int8_t taille = (int)memory.buffer[memory.tail];
 
-	if(dbg)printf("taille pour tampon : %02x",memory.buffer[memory.tail]);
+	if(dbg)printf("taille pour tampon : %02x\n",memory.buffer[memory.tail]);
 
 	*size = taille;
 	advance_tail(); //on passe la valeur de la taille
