@@ -37,7 +37,7 @@ int allocateMemory(size_t size)
 
 int writeMemory(void *data, u_int8_t size)
 {
-	if(dbg)printf("Entre fonction writeMem head : %ld tail : %ld\n",memory.head,memory.tail);
+	if(dbg)printf("Entre fonction writeMem head : %ld tail : %ld size msg : %d",memory.head,memory.tail,size);
 
 	if ((int)availableMemory() < size) return -1; //il n'y a pas assez de place dans la mémoire
 
@@ -70,9 +70,9 @@ void *readMemory(u_int8_t *size)
 	*size = taille;
 	advance_tail(); //on passe la valeur de la taille
 
+	if(dbg)printf("copie de tanpon : ");
 	for (int i=0; i<taille; i++)
 	{
-		if(dbg)printf("copie de tanpon : ");
 		tampon[i] = memory.buffer[i]; // "+ 1" car on ignore l'octet signifiant la taille
 		if(dbg)printf("%02x ",memory.buffer[i]);
 		advance_tail();
