@@ -109,11 +109,11 @@ size_t availableMemory(void)
 	if (memory.full) size = 0;
 	if (memory.head < memory.tail)
 	{
-		size = memory.head - memory.tail;
+		size = memory.tail - memory.head;
 	}
 	else 
 	{
-		size = memory.max + memory.head - memory.tail;
+		size = memory.max + memory.tail - memory.head;
 	}
 	return size;
 }
