@@ -44,8 +44,7 @@ int writeMemory(void *data, u_int8_t size)
 	u_int8_t *p = data;
 
 	//rajoute la taille de la donnée avant la donnée 
-	*p = size;
-	p++;
+	memory.buffer[memory.head] = size;
 	advance_head();
 
 	//on ajoute la donnée octet par octet 
