@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include "memoire.h"
 
-//static u_int8_t tampon; //pour fonction read memory
-
 #define MAX_TAMPON 256
 
 #ifdef DEBUG
@@ -62,6 +60,12 @@ void *readMemory(u_int8_t *size)
 {
 	if(dbg)printf("Entre fonction readMem head : %ld tail : %ld\n",memory.head,memory.tail);
 	
+	if (memoryIsEmpty())
+	{
+		return	NULL;
+		*size = 0;
+	}
+
 	static u_int8_t tampon[MAX_TAMPON];  //static pour ne pas avoir à free
 
 	u_int8_t taille = (int)memory.buffer[memory.tail];
@@ -86,11 +90,6 @@ bool memoryIsEmpty(void)
 	return (!memory.full && (memory.head == memory.tail));
 }
 
-bool memoryIsFull(void)
-{
-	return memory.full;
-}
-
 //reset le buffer
 void circ_buff_reset()
 {
@@ -105,7 +104,7 @@ size_t availableMemory(void)
 	size_t size;
 
 	if (memory.full) size = 0;
-	if (memory.head > memory.tail)
+	if (memory.head < memory.tail)
 	{
 		size = memory.head - memory.tail;
 	}
@@ -118,16 +117,13 @@ size_t availableMemory(void)
 
 void advance_head()
 {
-	//if (memoryIsFull()){
-	memory.head ++;
-	if (memory.head == memory.max) memory.head = 0;
+	if (++(memory.head) == memory.max) memory.head = 0;
 	memory.full = (memory.head == memory.tail);
+	memory.head ++;
 }
 
 void advance_tail()
 {
-	//if (memoryIsFull())
-		memory.tail ++;
-		if (memory.tail == memory.max) memory.tail = 0;
-	//memory.full = (memory.tail == memory.tail);
+	if (memory.full) memory.full = false;
+	if (++(memory.tail) == memory.max) memory.tail = 0;
 }
