@@ -33,13 +33,14 @@ int thread_V(int i){
 }
 
 static void * fct_Thread(void * arg){
-	int status;
+	int status,launchMutex=0;
 	arg_thread_t * args = arg;
-	if(args->arg != NULL)thread_P(1);
+	if(args->arg != NULL)launchMutex=1;
+	if(launchMutex)thread_P(1);
 	args->fct(args->arg);
 	free(args->arg);
 	free(args);
-	if(args->arg != NULL)thread_V(1);
+	if(launchMutex)thread_V(1);
 	pthread_exit((void *)&status);
 }
 

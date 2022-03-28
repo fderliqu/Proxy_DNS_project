@@ -1,6 +1,7 @@
 //Main.c
 
 #include<stdio.h>
+#include<stdint.h>
 #include<signal.h>
 #include<stdlib.h>
 #include<unistd.h>
@@ -67,7 +68,7 @@ void fn(){
 void * log_thread(void * arg){
 	free(arg); //Pour éviter le warning unused variable
 	if(dbg)printf("Dans fonction log thread\n");
-	u_int8_t taille_msg;
+	uint8_t taille_msg;
 	void * tampon;
 	while(1){
 		//boucle infinie si la mémoire est vide, on ne lit pas
