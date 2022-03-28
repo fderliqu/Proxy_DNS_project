@@ -10,34 +10,37 @@
 #ifndef DEBUG
 	int debug = 0;
 #endif
+#define N_MUTEX 8
+pthread_mutex_t myMutex[N_MUTEX];
 
-pthread_mutex_t myMutex;
-
-int mutex_init()
+int mutex_init(int i)
 {
-	int status = pthread_mutex_init(&myMutex,NULL);
+	int status = pthread_mutex_init(&myMutex[i],NULL);
 	if(status != 0)return -1;
 	return 0;
 }
 
-int thread_P(){
-	int status = pthread_mutex_lock(&myMutex);
+int thread_P(int i){
+	int status = pthread_mutex_lock(&myMutex[i]);
 	if(status!=0)return -1;
 	return 0;
 }
 
-int thread_V(){
-	int status = pthread_mutex_unlock(&myMutex);
+int thread_V(int i){
+	int status = pthread_mutex_unlock(&myMutex[i]);
 	if(status!=0)return -1;
 	return 0;
 }
 
 static void * fct_Thread(void * arg){
+	int status;
 	arg_thread_t * args = arg;
+	if(args->arg != NULL)thread_P(1);
 	args->fct(args->arg);
 	free(args->arg);
 	free(args);
-	return 0;
+	if(args->arg != NULL)thread_V(1);
+	pthread_exit((void *)&status);
 }
 
 int launchThread(void *(*fct)(void *),void * arg, size_t argSize){

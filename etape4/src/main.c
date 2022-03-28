@@ -4,7 +4,6 @@
 #include<signal.h>
 #include<stdlib.h>
 #include<unistd.h>
-#include<dlfcn.h>
 #include<string.h>
 #include<stdbool.h>
 #include"genericLog.h"
@@ -35,39 +34,38 @@ char server[MAX_SERVER] = DEFAULT_SERVER, port[MAX_PORT] = DEFAULT_PORT, strateg
 
 int s; //La socket de lecture en global pour l'utiliser dans la fonction handler de signal (fonction fn)
 
+int arret=0;
+int fin=0;
+
 typedef struct arg_s{
 	int s;
 	unsigned char msg[DNS_UDP_MAX_PACKET_SIZE];
 	int taille_msg;
-	struct sockaddr_storage adresse;
+	void * adresse;
 	int taille;
 }arg_t;
 
 //Fonction handler pour la réception du signal d'arrêt
 void fn(){
-	#ifdef DEBUG
-	printf("\nKILL BY SIGINT, CLOSE EVERYTHING PROPERLY\n");
-	#endif
+	arret=1;
 
-	close(s); //Arrêt de la socket de lecture
-
-	#ifdef DEBUG
-	printf("Arrêt du socket de réception = succès\n");
-	#endif
+	if(dbg)printf("\nKILL BY SIGINT, CLOSE EVERYTHING PROPERLY\n");
 	
-	if( strcmp(strategie,DEFAULT_STRAT) != 0 )endStrategy(); //Arrêt de la biblio de stratégie
-
-	#ifdef DEBUG
-	printf("Arrêt de la biblio = succès\n\n");
-	#endif
-
+	close(s); //Arrêt de la socket de lecture
+	if(dbg)printf("Arrêt du socket de réception = succès\n");
+	
+	endStrategy(); //Arrêt de la biblio de stratégie
+	if(dbg)printf("Arrêt de la biblio = succès\n\n");
+	
+	desallocateMemory();//Désalloue la memoire
+	sleep(2);//On attend 1 ou 2 seconde pour que le thread se termine proprement
 	exit(-1);
 }
 
 //Fonction thread de log
 
 void * log_thread(void * arg){
-	if(arg != NULL)return NULL; //Pour éviter le warning unused variable
+	free(arg); //Pour éviter le warning unused variable
 	if(dbg)printf("Dans fonction log thread\n");
 	u_int8_t taille_msg;
 	void * tampon;
@@ -75,7 +73,9 @@ void * log_thread(void * arg){
 		//boucle infinie si la mémoire est vide, on ne lit pas
 		while(memoryIsEmpty()){
 			sleep(1);
+			if(arret == 1)break;
 		}
+		if(arret == 1)break;
 		//Arrivée d'un write, donc lecture
 		tampon = readMemory(&taille_msg);
 		logMsg_t* msg = malloc(sizeof(logMsg_t)-1+taille_msg);//Création de log_msg_t
@@ -97,6 +97,7 @@ void * log_thread(void * arg){
 		}
 		free(msg);
 	}
+	if(dbg)printf("Arret 3\n");
 	return NULL;
 }
 
@@ -114,17 +115,19 @@ void * proxy_thread(void * arg){
 	int status = writeMemory(args->msg,args->taille_msg);
 	if(dbg)printf("status = %d\n",status);
 	int nboctets = messageUDP(server,port,args->msg,args->taille_msg);//Envoie du message vers le serveur DNS et réception de la réponse
-        sendto(s,args->msg,nboctets,0,(struct sockaddr *)&args->adresse,args->taille);//Envoie de la réponse vers le client initial
+        status = send_rep_proxy_dns(s,args->msg,nboctets,(struct sockaddr *)args->adresse,args->taille);
+	free(args->adresse);
 	return NULL;
 }
 
-void proxy_dns(int s, unsigned char* message, int taille_message, struct sockaddr * adresse, int taille){
+void proxy_dns(int s, unsigned char* message, int taille_message, void * adresse, int taille){
 	//Stockage des arguments
 	arg_t arg;
 	arg.s = s;
 	memcpy(arg.msg,message,taille_message);
 	arg.taille_msg = taille_message;
-	memcpy(&arg.adresse,adresse,taille);
+	arg.adresse = malloc(taille);
+	memcpy(arg.adresse,adresse,taille);
 	arg.taille = taille;
 	//Lancement thread de proxy
 	int status = launchThread(proxy_thread,&arg,sizeof(arg_t));
@@ -164,6 +167,8 @@ int main(int argc,char * argv[]){
 	//Allocation de la mémoire de partage
 	size_t size = 256;
 	status = allocateMemory(size);
+	//Init mutex
+	status = mutex_init(1);
 	//Lancement du thread de log
 	status = launchThread(log_thread,NULL,0);
 	if(status != 0){
