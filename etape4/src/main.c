@@ -34,6 +34,9 @@ char server[MAX_SERVER] = DEFAULT_SERVER, port[MAX_PORT] = DEFAULT_PORT, strateg
 
 int s; //La socket de lecture en global pour l'utiliser dans la fonction handler de signal (fonction fn)
 
+int arret=0;
+int fin=0;
+
 typedef struct arg_s{
 	int s;
 	unsigned char msg[DNS_UDP_MAX_PACKET_SIZE];
@@ -44,6 +47,8 @@ typedef struct arg_s{
 
 //Fonction handler pour la réception du signal d'arrêt
 void fn(){
+	arret=1;
+
 	if(dbg)printf("\nKILL BY SIGINT, CLOSE EVERYTHING PROPERLY\n");
 	
 	close(s); //Arrêt de la socket de lecture
@@ -53,6 +58,7 @@ void fn(){
 	if(dbg)printf("Arrêt de la biblio = succès\n\n");
 	
 	desallocateMemory();//Désalloue la memoire
+	sleep(2);//On attend 1 ou 2 seconde pour que le thread se termine proprement
 	exit(-1);
 }
 
@@ -67,7 +73,9 @@ void * log_thread(void * arg){
 		//boucle infinie si la mémoire est vide, on ne lit pas
 		while(memoryIsEmpty()){
 			sleep(1);
+			if(arret == 1)break;
 		}
+		if(arret == 1)break;
 		//Arrivée d'un write, donc lecture
 		tampon = readMemory(&taille_msg);
 		logMsg_t* msg = malloc(sizeof(logMsg_t)-1+taille_msg);//Création de log_msg_t
@@ -89,11 +97,12 @@ void * log_thread(void * arg){
 		}
 		free(msg);
 	}
+	if(dbg)printf("Arret 3\n");
 	return NULL;
 }
 
 void * proxy_thread(void * arg){
-	arg_t * args =((arg_thread_t *)arg)->arg;
+	arg_t * args = arg;
 	#ifdef DEBUG
 	printf("Est dans la fonction proxy_fct\n");
 	printf("message on proxy thread = ");
@@ -159,7 +168,7 @@ int main(int argc,char * argv[]){
 	size_t size = 256;
 	status = allocateMemory(size);
 	//Init mutex
-	status = mutex_init();
+	status = mutex_init(1);
 	//Lancement du thread de log
 	status = launchThread(log_thread,NULL,0);
 	if(status != 0){
