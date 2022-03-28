@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "memoire.h"
 
 #define MAX_TAMPON 256
@@ -13,7 +14,7 @@ int dbg = 0;
 #endif
 
 typedef struct circ_buff_s {
-	u_int8_t * buffer;
+	uint8_t * buffer;
 	size_t head;
 	size_t tail;
 	size_t max;
@@ -38,13 +39,13 @@ int desallocateMemory(){
 	return 0;
 }
 
-int writeMemory(void *data, u_int8_t size)
+int writeMemory(void *data, uint8_t size)
 {
 	if(dbg)printf("\nDébut fonction writeMem head : %ld / tail : %ld / size msg : %d / size memory max : %ld \n",memory.head,memory.tail,size, memory.max);
 
 	if ((int)availableMemory() < size) return -1; //il n'y a pas assez de place dans la mémoire
 
-	u_int8_t *p = data;
+	uint8_t *p = data;
 
 	//rajoute la taille de la donnée avant la donnée 
 	memory.buffer[memory.head] = size;
@@ -61,19 +62,19 @@ int writeMemory(void *data, u_int8_t size)
 	return 0;
 }
 
-void *readMemory(u_int8_t *size)
+void *readMemory(uint8_t *size)
 {
 	if(dbg)printf("\nDébut fonction readMem head : %ld / tail : %ld\n",memory.head,memory.tail);
 	
 	if (memoryIsEmpty())
 	{
-		return	NULL;
 		*size = 0;
+		return	NULL;
 	}
 
-	static u_int8_t tampon[MAX_TAMPON];  //static pour ne pas avoir à free
+	static uint8_t tampon[MAX_TAMPON];  //static pour ne pas avoir à free
 
-	u_int8_t taille = (int)memory.buffer[memory.tail];
+	uint8_t taille = (int)memory.buffer[memory.tail];
 
 	if(dbg)printf("taille pour tampon : %02x\n",memory.buffer[memory.tail]);
 
@@ -96,6 +97,11 @@ void *readMemory(u_int8_t *size)
 bool memoryIsEmpty(void) 
 {
 	return (!memory.full && (memory.head == memory.tail));
+}
+
+bool memoryIsFull()
+{
+	return (memory.full);
 }
 
 //reset le buffer

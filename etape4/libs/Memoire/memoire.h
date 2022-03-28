@@ -1,8 +1,8 @@
 //Fonctions principales 
 int allocateMemory(size_t size);
 int desallocateMemory();
-int writeMemory(void *data, u_int8_t size);
-void *readMemory(u_int8_t *size);
+int writeMemory(void *data, uint8_t size);
+void *readMemory(uint8_t *size);
 
 //Fonctions pour gérer le buffer circulaire
 bool memoryIsEmpty(void);
