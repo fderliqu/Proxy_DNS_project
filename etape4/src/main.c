@@ -59,7 +59,10 @@ void fn(){
 	if(dbg)printf("Arrêt de la biblio = succès\n\n");
 	
 	desallocateMemory();//Désalloue la memoire
+
 	sleep(2);//On attend 1 ou 2 seconde pour que le thread se termine proprement
+
+	mutex_destroy(); //On détruit les mutex après la fin de ces derniers
 	exit(-1);
 }
 
@@ -169,7 +172,7 @@ int main(int argc,char * argv[]){
 	size_t size = 256;
 	status = allocateMemory(size);
 	//Init mutex
-	status = mutex_init(1);
+	status = mutex_init();
 	//Lancement du thread de log
 	status = launchThread(log_thread,NULL,0);
 	if(status != 0){
