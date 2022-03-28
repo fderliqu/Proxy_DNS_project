@@ -5,6 +5,13 @@
 #include <stdlib.h>
 #include "memoire.h"
 
+#ifdef DEBUG
+int debug = 1;
+#endif
+#ifndef DEBUG
+int debug = 0;
+#endif
+
 void test_allocateMemory(size_t size)
 {
 	printf("\nTest allocateMemory, size=%d : ",(int)size);

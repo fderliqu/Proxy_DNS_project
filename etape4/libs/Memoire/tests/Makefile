@@ -18,3 +18,4 @@ test: testMemory
 
 clean:
 	rm -f ./*.o
+	rm -f $(TARGET)
