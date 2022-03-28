@@ -35,9 +35,9 @@ int thread_V(){
 static void * fct_Thread(void * arg){
 	int status;
 	arg_thread_t * args = arg;
-	args->fct(args->arg);
+	args->fct(arg);
 	free(args->arg);
-	free(args);
+	free(arg);
 	pthread_exit((void *)&status);
 }
 

@@ -49,7 +49,7 @@ void fn(){
 	close(s); //Arrêt de la socket de lecture
 	if(dbg)printf("Arrêt du socket de réception = succès\n");
 	
-	if( strcmp(strategie,DEFAULT_STRAT) != 0 )endStrategy(); //Arrêt de la biblio de stratégie
+	endStrategy(); //Arrêt de la biblio de stratégie
 	if(dbg)printf("Arrêt de la biblio = succès\n\n");
 	
 	desallocateMemory();//Désalloue la memoire
@@ -59,7 +59,7 @@ void fn(){
 //Fonction thread de log
 
 void * log_thread(void * arg){
-	if(arg != NULL)return NULL; //Pour éviter le warning unused variable
+	free(arg); //Pour éviter le warning unused variable
 	if(dbg)printf("Dans fonction log thread\n");
 	u_int8_t taille_msg;
 	void * tampon;
@@ -93,7 +93,7 @@ void * log_thread(void * arg){
 }
 
 void * proxy_thread(void * arg){
-	arg_t * args = arg;
+	arg_t * args =((arg_thread_t *)arg)->arg;
 	#ifdef DEBUG
 	printf("Est dans la fonction proxy_fct\n");
 	printf("message on proxy thread = ");

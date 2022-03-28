@@ -10,7 +10,7 @@
 void * handle;
 
 int loadStrategy(char lib_name[LIB_MAX_SIZE]){
-	handle = dlopen(lib_name,RTLD_LAZY);
+	handle = dlopen(lib_name,RTLD_NOW);
 	if(!handle) {
 		return -1;
 	}
@@ -36,6 +36,7 @@ int logStrategy(logMsg_t * msg){
 		if ((error = dlerror()) != NULL)  {
 			return -1;
 		}
+		if(error != NULL)free(error);
 	}
 	(*addLog)(msg);
 	return 0;
