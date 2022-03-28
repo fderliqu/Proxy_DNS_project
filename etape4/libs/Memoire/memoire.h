@@ -1,3 +1,6 @@
+#ifndef __MEMORY_H__
+#define __MEMORY_H__
+
 //Fonctions principales 
 int allocateMemory(size_t size);
 int desallocateMemory();
@@ -11,4 +14,6 @@ size_t availableMemory(void);
 void circ_buff_reset();
 void advance_head();
 void advance_tail();
+
+#endif
 
