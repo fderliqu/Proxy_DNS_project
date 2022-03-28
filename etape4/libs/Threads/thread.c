@@ -33,11 +33,12 @@ int thread_V(){
 }
 
 static void * fct_Thread(void * arg){
+	int status;
 	arg_thread_t * args = arg;
 	args->fct(args->arg);
 	free(args->arg);
 	free(args);
-	return 0;
+	pthread_exit((void *)&status);
 }
 
 int launchThread(void *(*fct)(void *),void * arg, size_t argSize){

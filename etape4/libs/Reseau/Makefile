@@ -22,11 +22,10 @@ clean:
 	rm -f *.o
 	rm -f $(TARGET)
 
-#
 # Executable
 #
 reseau.o: reseau.c
-	$(CC) -c $^
+	$(CC) $(CFLAGS) -c $^
 
 $(TARGET): reseau.o
 	$(AR) $@ $^ 

@@ -1,12 +1,12 @@
-#include"reseau.h"
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
 #include<stdint.h>
 #include<unistd.h>
-#include<sys/types.h>
 #include<sys/socket.h>
+#include<sys/types.h>
 #include<netdb.h>
+#include"reseau.h"
 #include"dns.h"
 #include"dns_server.h"
 //SERVEUR
@@ -47,20 +47,6 @@ int initialisationSocketUDP(char *service){
 
 	return s;
 }
-
-#if 0
-int boucleServeurUDP(int s,int (*traitement)(unsigned char *,int)){
-while(1){
-  struct sockaddr_storage adresse;
-  socklen_t taille=sizeof(adresse);
-  unsigned char message[MAX_UDP_MESSAGE];
-  int nboctets=recvfrom(s,message,MAX_UDP_MESSAGE,0,(struct sockaddr *)&adresse,&taille);
-  if(nboctets<0) return -1;
-  if(traitement(message,nboctets)<0) break;
-  }
-return 0;
-}
-#endif
 
 //CLIENT
 
@@ -106,7 +92,7 @@ int messageUDP(char *hote,char *service,unsigned char *message,int taille){
 	return nboctets;
 }
 
-int boucleServeurUDP(int s,void (* traitement)(int,unsigned char*,int,struct sockaddr*,int)){
+int boucleServeurUDP(int s,void (* traitement)(int,unsigned char*,int,void *,int)){
 
 	//boucleServeurUDP(s);
 	while(1){
@@ -119,3 +105,12 @@ int boucleServeurUDP(int s,void (* traitement)(int,unsigned char*,int,struct soc
 //	close(s);
 	return 0;
 }
+
+int send_rep_proxy_dns(int s, unsigned char* message, int taille_message, void * adresse, int taille){
+	int nboctets = sendto(s,message,taille_message,0,adresse,taille);
+	if(nboctets<0){
+		perror("send_rep_proxy_dns_generique.sendto");exit(EXIT_FAILURE);
+	}
+	return 0;
+}
+

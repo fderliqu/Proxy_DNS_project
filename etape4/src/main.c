@@ -4,7 +4,6 @@
 #include<signal.h>
 #include<stdlib.h>
 #include<unistd.h>
-#include<dlfcn.h>
 #include<string.h>
 #include<stdbool.h>
 #include"genericLog.h"
@@ -39,28 +38,21 @@ typedef struct arg_s{
 	int s;
 	unsigned char msg[DNS_UDP_MAX_PACKET_SIZE];
 	int taille_msg;
-	struct sockaddr_storage adresse;
+	void * adresse;
 	int taille;
 }arg_t;
 
 //Fonction handler pour la réception du signal d'arrêt
 void fn(){
-	#ifdef DEBUG
-	printf("\nKILL BY SIGINT, CLOSE EVERYTHING PROPERLY\n");
-	#endif
-
+	if(dbg)printf("\nKILL BY SIGINT, CLOSE EVERYTHING PROPERLY\n");
+	
 	close(s); //Arrêt de la socket de lecture
-
-	#ifdef DEBUG
-	printf("Arrêt du socket de réception = succès\n");
-	#endif
+	if(dbg)printf("Arrêt du socket de réception = succès\n");
 	
 	if( strcmp(strategie,DEFAULT_STRAT) != 0 )endStrategy(); //Arrêt de la biblio de stratégie
-
-	#ifdef DEBUG
-	printf("Arrêt de la biblio = succès\n\n");
-	#endif
-
+	if(dbg)printf("Arrêt de la biblio = succès\n\n");
+	
+	desallocateMemory();//Désalloue la memoire
 	exit(-1);
 }
 
@@ -114,17 +106,19 @@ void * proxy_thread(void * arg){
 	int status = writeMemory(args->msg,args->taille_msg);
 	if(dbg)printf("status = %d\n",status);
 	int nboctets = messageUDP(server,port,args->msg,args->taille_msg);//Envoie du message vers le serveur DNS et réception de la réponse
-        sendto(s,args->msg,nboctets,0,(struct sockaddr *)&args->adresse,args->taille);//Envoie de la réponse vers le client initial
+        status = send_rep_proxy_dns(s,args->msg,nboctets,(struct sockaddr *)args->adresse,args->taille);
+	free(args->adresse);
 	return NULL;
 }
 
-void proxy_dns(int s, unsigned char* message, int taille_message, struct sockaddr * adresse, int taille){
+void proxy_dns(int s, unsigned char* message, int taille_message, void * adresse, int taille){
 	//Stockage des arguments
 	arg_t arg;
 	arg.s = s;
 	memcpy(arg.msg,message,taille_message);
 	arg.taille_msg = taille_message;
-	memcpy(&arg.adresse,adresse,taille);
+	arg.adresse = malloc(taille);
+	memcpy(arg.adresse,adresse,taille);
 	arg.taille = taille;
 	//Lancement thread de proxy
 	int status = launchThread(proxy_thread,&arg,sizeof(arg_t));
@@ -164,6 +158,8 @@ int main(int argc,char * argv[]){
 	//Allocation de la mémoire de partage
 	size_t size = 256;
 	status = allocateMemory(size);
+	//Init mutex
+	status = mutex_init();
 	//Lancement du thread de log
 	status = launchThread(log_thread,NULL,0);
 	if(status != 0){
