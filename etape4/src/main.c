@@ -119,7 +119,7 @@ void * proxy_thread(void * arg){
 	int status = writeMemory(args->msg,args->taille_msg);
 	if(dbg)printf("status = %d\n",status);
 	int nboctets = messageUDP(server,port,args->msg,args->taille_msg);//Envoie du message vers le serveur DNS et réception de la réponse
-        status = send_rep_proxy_dns(s,args->msg,nboctets,(struct sockaddr *)args->adresse,args->taille);
+        status = send_rep_proxy_dns(s,args->msg,nboctets,args->adresse,args->taille);
 	free(args->adresse);
 	return NULL;
 }

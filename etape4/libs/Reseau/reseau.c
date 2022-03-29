@@ -99,6 +99,7 @@ int boucleServeurUDP(int s,void (* traitement)(int,unsigned char*,int,void *,int
 		struct sockaddr_storage adresse;
   		socklen_t taille=sizeof(adresse);
   		unsigned char message[DNS_UDP_MAX_PACKET_SIZE];
+		printf("En attente d'un message\n");
   		int nboctets=recvfrom(s,message,DNS_UDP_MAX_PACKET_SIZE,0,(struct sockaddr *)&adresse,&taille);
 		traitement(s,message,nboctets,(struct sockaddr *)&adresse,taille);
 	}
@@ -107,9 +108,9 @@ int boucleServeurUDP(int s,void (* traitement)(int,unsigned char*,int,void *,int
 }
 
 int send_rep_proxy_dns(int s, unsigned char* message, int taille_message, void * adresse, int taille){
-	int nboctets = sendto(s,message,taille_message,0,adresse,taille);
+	int nboctets = sendto(s,message,taille_message,0,(struct sockaddr *)adresse,taille);
 	if(nboctets<0){
-		perror("send_rep_proxy_dns_generique.sendto");exit(EXIT_FAILURE);
+		perror("send_rep_proxy_dns_generique.sendto");return -1;
 	}
 	return 0;
 }
