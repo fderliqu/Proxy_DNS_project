@@ -42,14 +42,14 @@ int logStrategy(logMsg_t * msg){
 	return 0;
 }
 
-int endStrategy(void * f){
+int endStrategy(){
 	char *error;
-	int (*endLog)(void *);
+	int (*endLog)();
 	endLog = dlsym(handle,"endLog");
 	if ((error = dlerror()) != NULL)  {
       		return -1;
 	}
-	(*endLog)(f);
+	(*endLog)();
 	dlclose(handle);
 	return 0;
 }
