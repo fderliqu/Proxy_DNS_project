@@ -4,7 +4,7 @@
 #include<getopt.h>
 #include<string.h>
 
-int args(int argc, char * argv[],char * server, char * port, char * strategie, char * init_args_strategie){
+int args(int argc, char * argv[],char * server, char * port, char * strategie, char * init_args_strategie, char * configfile){
 	int opt;
 	while(1){
 		static struct option long_option[] = {
@@ -13,11 +13,12 @@ int args(int argc, char * argv[],char * server, char * port, char * strategie, c
 			{"serveur",1,0,'s'},
 			{"logstrategie",1,0,'l'},
 			{"initlogstrategie",1,0,'i'},
+			{"configfile",1,0,'c'},
 			{0,0,0,0}
 		};
 
 		int option_index = 0;
-		opt = getopt_long(argc,argv,"hp:s:l:i:",long_option,&option_index);
+		opt = getopt_long(argc,argv,"hp:s:l:i:c:",long_option,&option_index);
 		if(opt == -1)break;
 		switch(opt){
 			case 'h':
@@ -27,6 +28,7 @@ int args(int argc, char * argv[],char * server, char * port, char * strategie, c
 				printf("\t-s SERVEUR et --serveur=SERVEUR : permet de spécifier un serveur DNS particulier à la place du serveur DNS par défaut\n");
 				printf("\t-l STRATEGIE et --logstrategy=STRATEGIE : permet de choisir la stratégie à charger (DNSinFILE/1 or PrintDomainName/2)\n");
 				printf("\t-i INIT_ARGS_STRATEGIE et --initlogstrategie=INIT_ARGS_STRATEGIE : permet de passer des paramètres d'initialisation à la stratégie choisie \n");
+				printf("\t-c CONFIG_FILE et --configfile=CONFIG_FILE : permet de spécifier le fichier de configuration\n");
 				printf("EXAMPLE\n\t<path>/proxydns -p 53 -s 193.48.57.48 -l 2 -i fichier.txt\n\t<path>/proxydns --port=53 --serveur=193.48.57.48 -l PrintDNSinFILE -i fichier.txt\n\n");
 
 				return -1;
@@ -64,6 +66,14 @@ int args(int argc, char * argv[],char * server, char * port, char * strategie, c
 				#endif
 
 				strcpy(init_args_strategie,optarg);
+				break;
+
+			case 'c':
+				#ifdef DEBUG
+				printf("option c with arg %s\n", optarg);
+				#endif
+
+				strcpy(configfile,optarg);
 				break;
 
 			case '?':

@@ -18,10 +18,12 @@
 #define DEFAULT_SERVER "193.48.57.48"
 #define DEFAULT_PORT "53"
 #define DEFAULT_STRAT "none"
+#define DEFAULT_CONFIG "none"
 #define DEFAULT_INIT "default_output.txt"
 #define MAX_SERVER 1024
 #define MAX_PORT 1024
 #define MAX_STRAT 1024
+#define MAX_CONFIG 1024
 
 #ifndef DEBUG
 int dbg = 0;
@@ -31,7 +33,7 @@ int dbg = 0;
 int dbg = 1;
 #endif
 
-char server[MAX_SERVER] = DEFAULT_SERVER, port[MAX_PORT] = DEFAULT_PORT, strategie[MAX_STRAT]= DEFAULT_STRAT, init_args_strategie[MAX_STRAT] = DEFAULT_INIT;
+char server[MAX_SERVER] = DEFAULT_SERVER, port[MAX_PORT] = DEFAULT_PORT, strategie[MAX_STRAT]= DEFAULT_STRAT, init_args_strategie[MAX_STRAT] = DEFAULT_INIT, configfile[MAX_CONFIG] = DEFAULT_CONFIG;
 
 int s; //La socket de lecture en global pour l'utiliser dans la fonction handler de signal (fonction fn)
 
@@ -143,7 +145,7 @@ void proxy_dns(int s, unsigned char* message, int taille_message, void * adresse
 
 
 int main(int argc,char * argv[]){
-	int status = args(argc,argv,server,port,strategie,init_args_strategie); //Réception des arguments
+	int status = args(argc,argv,server,port,strategie,init_args_strategie,configfile); //Réception des arguments
 	if(status == -1)return 0;
 
 	#ifdef DEBUG
