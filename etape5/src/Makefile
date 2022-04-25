@@ -14,7 +14,10 @@ main.o : main.c
 args.o : args.c
 	$(CC) $(CFLAGS) -c $<
 
-$(TARGET): main.o args.o
+dnsproxy_mgr.o: dnsproxy_mgr.c
+	$(CC) $(CFLAGS) -c $<
+
+$(TARGET): main.o args.o dnsproxy_mgr.o
 	$(CC) -o $@ $^ $(LIBDIR) $(BIBLIO)
 
 clean:
