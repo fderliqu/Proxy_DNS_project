@@ -24,6 +24,7 @@
 #define MAX_PORT 1024
 #define MAX_STRAT 1024
 #define MAX_CONFIG 1024
+#define MAX_MSG 1024
 
 #ifndef DEBUG
 int dbg = 0;
@@ -145,6 +146,56 @@ void proxy_dns(int s, unsigned char* message, int taille_message, void * adresse
 		printf("Erreur : changement du thread proxy\n");
 		exit(-1);
 	}
+}
+
+unsigned char* fake_msg(int * p_final_size, unsigned char* message, int msg_size, unsigned char * data, int data_size, unsigned char type)
+{ //avec type = 0x01 pour ipv4 / 0x1c pour IPv6 / 0x0f pour mx
+	unsigned char final_msg[MAX_MSG];
+	*p_final_size = msg_size;
+
+	//On copie le message dans la réponse
+	for (int i=0; i<msg_size; i++)
+	{
+		final_msg[i]=message[i];
+	}
+
+	//modifications du header
+	final_msg[2]=0x81; //On change pour avoir QR à 1
+	final_msg[3]=0x80; //On met RA à 1 et Z et RCODE à 0
+	final_msg[6]=0x00; //On met ANCOUNT à 0x00 01
+	final_msg[7]=0x01; 
+
+
+	//NAME
+	final_msg[*p_final_size+1] = 0xc0;
+	final_msg[*p_final_size+2] = 0x0c;
+
+	//TYPE
+	final_msg[*p_final_size+3] = 0x00;
+	final_msg[*p_final_size+4] = type;
+
+	//CLASS
+	final_msg[*p_final_size+5] = 0x00;
+	final_msg[*p_final_size+6] = 0x01;
+
+	//TTL
+	final_msg[*p_final_size+7] = 0x00;
+	final_msg[*p_final_size+8] = 0x00;
+	final_msg[*p_final_size+9] = 0x02;
+	final_msg[*p_final_size+10] = 0x42;
+
+	//RDLENGTH
+	final_msg[*p_final_size+11] = data_size % 255;
+	final_msg[*p_final_size+12] = data_size / 255;
+
+	//RDATA
+	for (int i=0; i<data_size; i++)
+	{
+		final_msg[*p_final_size+13+i] = data[i];
+	}
+
+	*p_final_size += 12 + data_size;
+
 }
 
 
