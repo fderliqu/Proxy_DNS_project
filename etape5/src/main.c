@@ -109,6 +109,7 @@ void * log_thread(void * arg){
 
 void * proxy_thread(void * arg){
 	arg_t * args = arg;
+
 	#ifdef DEBUG
 	printf("Est dans la fonction proxy_fct\n");
 	printf("message on proxy thread = ");
@@ -117,9 +118,12 @@ void * proxy_thread(void * arg){
 	}
 	printf("\n");
 	#endif
+
 	//Ecriture vers la mémoire
 	int status = writeMemory(args->msg,args->taille_msg);
+
 	if(dbg)printf("status = %d\n",status);
+
 	int nboctets = messageUDP(server,port,args->msg,args->taille_msg);//Envoie du message vers le serveur DNS et réception de la réponse
         status = send_rep_proxy_dns(s,args->msg,nboctets,args->adresse,args->taille);
 	free(args->adresse);
@@ -145,7 +149,7 @@ void proxy_dns(int s, unsigned char* message, int taille_message, void * adresse
 
 
 int main(int argc,char * argv[]){
-	int status = args(argc,argv,server,port,strategie,init_args_strategie,configfile); //Réception des arguments
+	int status = args(argc, argv,server, port, strategie, init_args_strategie, configfile); //Réception des arguments
 	if(status == -1)return 0;
 
 	#ifdef DEBUG
