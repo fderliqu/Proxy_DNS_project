@@ -14,6 +14,7 @@
 #include"args.h"
 #include"thread.h"
 #include"memoire.h"
+#include"shmDNS.h"
 
 #define DEFAULT_SERVER "193.48.57.48"
 #define DEFAULT_PORT "53"
@@ -178,9 +179,8 @@ void fake_msg(unsigned char* final_msg, int * p_final_size, unsigned char * data
 
 void proxy_dns(int s, unsigned char* message, int taille_message, void * adresse, int taille){
 	//Stockage des arguments
-/*	int size=4;
-	unsigned char data[] = {0xff,0xff,0xff,0xff};
-	fake_msg(message,&taille_message,data,size,0xff);*/
+	
+	//fake_msg(message,&taille_message,data,size,0xff);
 	arg_t arg;
 	arg.s = s;
 	memcpy(arg.msg,message,taille_message);
@@ -196,7 +196,8 @@ void proxy_dns(int s, unsigned char* message, int taille_message, void * adresse
 	}
 }
 
-
+int shmid;
+struct mgr_s * shared_mem;
 
 int main(int argc,char * argv[]){	
 	int status = args(argc, argv,server, port, strategie, init_args_strategie, configfile); //Réception des arguments
@@ -223,6 +224,26 @@ int main(int argc,char * argv[]){
 	#endif
 
 	signal(SIGINT,fn);//Création du signal
+	
+	shmid = get_shm_id(CLE,NB_SHM_DATA*sizeof(struct mgr_s),0);
+	struct mgr_s * p_shared_mem;
+	shared_mem = (struct mgr_s *)get_shm_addr(shmid);
+	if(status < 0){
+		perror("get_shm_id");exit(1);
+	}
+	p_shared_mem = shared_mem;
+	if( strcmp(configfile,DEFAULT_CONFIG) != 0){
+		FILE * file;
+		file = fopen(configfile,"r");
+		if(file != NULL){
+			perror("fopen");exit(1);
+		}
+		char buf[500];
+		while(fscanf(file,"%s\n",buf) == 1){
+			tidy_mgr(p_shared_mem,buf);
+		p_shared_mem++;
+		}
+	}	
 	s = initialisationSocketUDP(port); //Création socket de lecture
 	//Allocation de la mémoire de partage
 	size_t size = 256;

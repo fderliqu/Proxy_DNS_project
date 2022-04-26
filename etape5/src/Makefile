@@ -2,8 +2,8 @@
 
 CC=gcc
 LIBDIR = -L ../libs/static -L ../libs/dynamic
-INCDIR = -I ../libs/Reseau -I ../libs/Log -I ../libs/Threads -I ../libs/Memoire
-BIBLIO = -lreseau -lgenericLog -ldl -lpthread -lthread -lmemoire
+INCDIR = -I ../libs/Reseau -I ../libs/Log -I ../libs/Threads -I ../libs/Memoire -I ../libs/SharedMem	
+BIBLIO = -lreseau -lgenericLog -ldl -lpthread -lthread -lmemoire -lshm
 TARGET = ../bin/proxydns
 
 all: $(TARGET)
@@ -12,9 +12,6 @@ main.o : main.c
 	$(CC) $(CFLAGS) -c $< $(INCDIR) $(LIBDIR) $(BIBLIO)
 
 args.o : args.c
-	$(CC) $(CFLAGS) -c $<
-
-dnsproxy_mgr.o: dnsproxy_mgr.c
 	$(CC) $(CFLAGS) -c $<
 
 $(TARGET): main.o args.o
