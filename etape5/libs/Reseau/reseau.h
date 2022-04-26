@@ -16,5 +16,7 @@ int messageUDP(
 		unsigned char *,
 		int);
 
+int nomVersAdresse(char*,unsigned char*);
+
 #endif
 

@@ -198,7 +198,7 @@ void proxy_dns(int s, unsigned char* message, int taille_message, void * adresse
 
 
 
-int main(int argc,char * argv[]){
+int main(int argc,char * argv[]){	
 	int status = args(argc, argv,server, port, strategie, init_args_strategie, configfile); //Réception des arguments
 	if(status == -1)return 0;
 
