@@ -2,6 +2,9 @@
 #include<stdlib.h>
 #include<assert.h>
 #include<string.h>
+#include<sys/types.h>
+#include<sys/socket.h>
+#include<netdb.h>
 
 #include"shmDNS.h"
 
@@ -48,20 +51,43 @@ int test_free_shmid(int shmid){
 	return status;
 }
 
+int nomVersAdresse(char *hote,struct sockaddr_storage *padresse)
+{
+struct addrinfo *resultat,*origine;
+statut=getaddrinfo(hote,NULL,NULL,&origine);
+if(statut==EAI_NONAME) return -1;
+if(statut<0){ perror("nomVersAdresse.getaddrinfo"); exit(EXIT_FAILURE); }
+struct addrinfo *p;
+for(p=origine,resultat=origine;p!=NULL;p=p->ai_next)
+  if(p->ai_family==AF_INET6){ resultat=p; break; }
+memcpy(padresse,resultat->ai_addr,resultat->ai_addrlen);
+return 0;
+}
+
 int main(){
 	printf("variables\n");
-	int shmid;
+	int shmid,shmid2;
 	struct mgr_s * data;
+	struct mgr_s * p_data;
 	char * str1="testocc1", *str2="testocc2";
 	printf("debut\n");
 	shmid = test_get_shm_id(CLE,NB_SHM_DATA*sizeof(struct mgr_s),0);
 	printf("shmid : %d\n",shmid);
 	data = (struct mgr_s *)test_get_shm_addr(shmid);
-	strcpy(data->domaine,str1);
-	data++;
-	strcpy(data->domaine,str2);
-	printf("data0 : %s\ndata1 : %s",data[0].domaine,data[1].domaine);
+	p_data = data;
+	printf("addr : %p %p\n",p_data,&data[0]);
+	strcpy(p_data->domaine,str1);
+	p_data++;
+	printf("addr : %p %p\n",p_data,&data[1]);
+	strcpy(p_data->domaine,str2);
+	printf("data0 : %s\ndata1 : %s\n",data[0].domaine,data[1].domaine);
+	shmid2 = test_get_shm_id(CLE,NB_SHM_DATA*sizeof(struct mgr_s),1);
+	printf("shmid1 : %d = shmid2 : %d\n",shmid,shmid2);
 	test_free_shm_addr((void *)data);
 	test_free_shmid(shmid);
+	char ip[20];
+	nomVersAdresse("172.23.56.21",ip);
+	printf("%s\n",ip);
+	
 }
 
