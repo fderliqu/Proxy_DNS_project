@@ -55,6 +55,11 @@ void tidy_mgr(struct mgr_s * p_mgr_s, char *ligne)
 	sscanf(ligne,"%[^=]=%[^,],%[^,],%s",p_mgr_s->domaine,p_mgr_s->ipv4,p_mgr_s->ipv6,p_mgr_s->mx);
 }
 
+void supp_mgr(struct mgr_s * p_mgr_s)
+{
+	memset(p_mgr_s,0,sizeof(struct mgr_s));
+}
+
       
 	
       

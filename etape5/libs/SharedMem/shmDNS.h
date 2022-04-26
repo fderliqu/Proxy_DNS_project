@@ -22,3 +22,5 @@ int free_shm_addr(void *);
 int free_shmid(int);
 
 void tidy_mgr(struct mgr_s *, char *);
+
+void supp_mgr(struct mgr_s * );

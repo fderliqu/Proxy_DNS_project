@@ -2,10 +2,6 @@
 #include<stdlib.h>
 #include<assert.h>
 #include<string.h>
-#include<sys/types.h>
-#include<sys/socket.h>
-#include<netdb.h>
-
 #include"shmDNS.h"
 
 #ifdef DEBUG
@@ -51,17 +47,27 @@ int test_free_shmid(int shmid){
 	return status;
 }
 
-int nomVersAdresse(char *hote,struct sockaddr_storage *padresse)
+
+void test_tidy_mgr(struct mgr_s * p_mgr_s, char *ligne)
 {
-struct addrinfo *resultat,*origine;
-statut=getaddrinfo(hote,NULL,NULL,&origine);
-if(statut==EAI_NONAME) return -1;
-if(statut<0){ perror("nomVersAdresse.getaddrinfo"); exit(EXIT_FAILURE); }
-struct addrinfo *p;
-for(p=origine,resultat=origine;p!=NULL;p=p->ai_next)
-  if(p->ai_family==AF_INET6){ resultat=p; break; }
-memcpy(padresse,resultat->ai_addr,resultat->ai_addrlen);
-return 0;
+	printf("\nTest de tidy_mgr avec ligne : %s\n",ligne);
+	tidy_mgr(p_mgr_s, ligne);
+	printf("Nom de domaine : %s\n", p_mgr_s->domaine);
+	printf("IPV4 : %s\n", p_mgr_s->ipv4);
+	printf("IPV6 : %s\n", p_mgr_s->ipv6);
+	printf("MX : %s\n", p_mgr_s->mx);
+	printf("Fin du test \n");
+}
+
+void test_supp_mgr(struct mgr_s * p_mgr_s)
+{
+	printf("\nTest de supp_mgr : \n");
+	supp_mgr(p_mgr_s);
+	printf("Nom de domaine : %s\n", p_mgr_s->domaine);
+	printf("IPV4 : %s\n", p_mgr_s->ipv4);
+	printf("IPV6 : %s\n", p_mgr_s->ipv6);
+	printf("MX : %s\n", p_mgr_s->mx);
+	printf("Fin du test \n");
 }
 
 int main(){
@@ -85,9 +91,11 @@ int main(){
 	printf("shmid1 : %d = shmid2 : %d\n",shmid,shmid2);
 	test_free_shm_addr((void *)data);
 	test_free_shmid(shmid);
-	char ip[20];
-	nomVersAdresse("172.23.56.21",ip);
-	printf("%s\n",ip);
+	
+	struct mgr_s m, n;
+	test_tidy_mgr(&m, "t.vantroys.plil.fr=172.26.145.55,2001:660:4401:6050:5000::5,172.26.145.55");
+	test_tidy_mgr(&n, "www.google.com=172.26.145.56,,");
+	test_supp_mgr(&n);
 	
 }
 
