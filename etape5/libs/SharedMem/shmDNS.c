@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 #include<sys/shm.h>
 #include<sys/ipc.h>
 #include<sys/types.h>
@@ -48,60 +49,10 @@ int free_shmid(int shmid){
 	return status;
 }
 
-void tidy_mgr(struct mgr_s * p_mgr_s, char ligne[MAX_CHAR])
+void tidy_mgr(struct mgr_s * p_mgr_s, char *ligne)
 {
-  int i = 0, emplacement=0, j=0 ;
-  do
-  {
- 
-    if (emplacement == 0){
-      if (ligne[i] == (',')){
-	  p_mgr_s->domaine[j]='\0';
-	  emplacement ++;
-	  j=0;
-	}
-      else {
-	p_mgr_s->domaine[j]=ligne[i];
-	j++;
-      }
-    }
-    
-    else if (emplacement == 1){
-      if (ligne[i] == (',')){
-	  p_mgr_s->ipv4[j]='\0';
-	  emplacement ++;
-	  j=0;
-	}
-      else {
-	p_mgr_s->ipv4[j]=ligne[i];
-	j++;
-      }
-    }
-      
-    else if (emplacement == 2){
-      if (ligne[i] == (',')){
-	  p_mgr_s->ipv6[j]='\0';
-	  emplacement ++;
-	  j=0;
-	}
-      else {
-	p_mgr_s->ipv6[j]=ligne[i];
-	j++;
-      }
-    }
-    else if (emplacement == 3){
-      if (ligne[i] == ('\0')){
-	  p_mgr_s->mx[j]='\0';
-	  emplacement=0;
-	  j=0;
-	}
-      else {
-	p_mgr_s->mx[j]=ligne[i];
-	j++;
-      }
-    }
-    i++;
-  } while (ligne[i] != '\0');
+	memset(p_mgr_s,0,sizeof(struct mgr_s));
+	sscanf(ligne,"%[^=]=%[^,],%[^,],%s",p_mgr_s->domaine,p_mgr_s->ipv4,p_mgr_s->ipv6,p_mgr_s->mx);
 }
 
       

@@ -2,10 +2,9 @@
 #define NB_SHM_DATA 1024
 
 #define MAX_DOMAINE 128
-#define MAX_IPV4 4
-#define MAX_IPV6 16
-#define MAX_MX 128
-#define MAX_CHAR 500
+#define MAX_IPV4 50
+#define MAX_IPV6 50
+#define MAX_MX 50
 
 struct mgr_s{
         char domaine[MAX_DOMAINE];
@@ -22,4 +21,4 @@ int free_shm_addr(void *);
 
 int free_shmid(int);
 
-void tidy_mgr(struct mgr_s *, char ligne[MAX_CHAR]);
+void tidy_mgr(struct mgr_s *, char *);
