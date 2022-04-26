@@ -7,10 +7,10 @@
 #define MAX_MX 128
 
 struct mgr_s{
-        unsigned char domaine[MAX_DOMAINE];
-        unsigned char ipv4[MAX_IPV4];
-        unsigned char ipv6[MAX_IPV6];
-        unsigned char mx[MAX_MX];
+        char domaine[MAX_DOMAINE];
+        char ipv4[MAX_IPV4];
+        char ipv6[MAX_IPV6];
+        char mx[MAX_MX];
 };
 
 int get_shm_id(void *,int,int);
