@@ -92,9 +92,10 @@ int main(){
 	test_free_shm_addr((void *)data);
 	test_free_shmid(shmid);
 	
-	struct mgr_s m, n;
+	struct mgr_s m, n, o;
 	test_tidy_mgr(&m, "t.vantroys.plil.fr=172.26.145.55,2001:660:4401:6050:5000::5,172.26.145.55");
 	test_tidy_mgr(&n, "www.google.com=172.26.145.56,,");
+	test_tidy_mgr(&o, "www.twitter.com=172.26.145.56,,172.26.145.55");
 	test_supp_mgr(&n);
 	
 }
