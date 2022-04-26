@@ -5,7 +5,7 @@
 #include<sys/types.h>
 #include<sys/sem.h>
 #include"shmDNS.h"
-#define MAX_CHAR 500
+
 
 
 int get_shm_id(int key,int taille,int option){
