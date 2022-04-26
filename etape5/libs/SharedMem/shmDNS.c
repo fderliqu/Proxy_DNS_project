@@ -8,17 +8,17 @@
 #define MAX_CHAR 500
 
 
-int get_shm_id(void * key,int taille,int option){
+int get_shm_id(int key,int taille,int option){
 	int status=0;
 	int flags;
 	if(option == 0){
 		flags = IPC_CREAT|IPC_EXCL|0666;
 	}
 	else{
-		flags = IPC_EXCL|0666;
+		flags = 0006;
 	}
-
-	if((status=shmget(*(key_t*)key, taille, flags)) == -1){
+	printf("%d,%d\n",(key_t)key,taille);
+	if((status=shmget((key_t)key, taille, flags)) == -1){
 			perror("shmget");exit(2);
 	}
 	return status;

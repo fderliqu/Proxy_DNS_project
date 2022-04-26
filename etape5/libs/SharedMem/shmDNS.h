@@ -1,4 +1,4 @@
-#define CLE (key_t)1000
+#define CLE 6666
 #define NB_SHM_DATA 1024
 
 #define MAX_DOMAINE 128
@@ -13,7 +13,7 @@ struct mgr_s{
         char mx[MAX_MX];
 };
 
-int get_shm_id(void *,int,int);
+int get_shm_id(int,int,int);
 
 void * get_shm_addr(int);
 

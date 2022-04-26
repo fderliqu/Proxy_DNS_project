@@ -12,7 +12,7 @@ int debug = 1;
 int debug = 0;
 #endif
 
-int test_get_shm_id(void * key, int taille, int option){
+int test_get_shm_id(int key, int taille, int option){
 	int status;
 	printf("test get_shm_id :");
 	status = get_shm_id(key,taille,option);
@@ -49,10 +49,12 @@ int test_free_shmid(int shmid){
 }
 
 int main(){
+	printf("variables\n");
 	int shmid;
 	struct mgr_s * data;
 	char * str1="testocc1", *str2="testocc2";
-	shmid = test_get_shm_id((void *)CLE,NB_SHM_DATA*sizeof(struct mgr_s),0);
+	printf("debut\n");
+	shmid = test_get_shm_id(CLE,NB_SHM_DATA*sizeof(struct mgr_s),0);
 	printf("shmid : %d\n",shmid);
 	data = (struct mgr_s *)test_get_shm_addr(shmid);
 	strcpy(data->domaine,str1);
