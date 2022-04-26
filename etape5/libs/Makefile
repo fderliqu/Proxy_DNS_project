@@ -1,4 +1,4 @@
-DIRS = Log Reseau Threads Memoire
+DIRS = Log Reseau Threads Memoire SharedMem
 
 all:
 	for dir in $(DIRS); do \
