@@ -87,3 +87,60 @@ int args(int argc, char * argv[],char * server, char * port, char * strategie, c
 	}
 	return 0;
 }
+
+int args_mgr(int argc, char * argv[],char * domain, char * ipv4, char * ipv6, char * mx, int * flag){
+	int opt;
+	while(1){
+		static struct option long_option[] = {
+			{"help",0,0,'h'},
+			{"add",0,0,'a'},
+			{"remove",0,0,'r'},
+			{"domain",1,0,'d'},
+			{"inet",1,0,'i'},
+			{"inet6",1,0,'I'},
+			{"mx",1,0,'m'},
+			{0,0,0,0}
+		};
+
+		int option_index = 0;
+		opt = getopt_long(argc,argv,"hard:i:I:m:",long_option,&option_index);
+		if(opt == -1)break;
+		switch(opt){
+			case 'h':
+				printf("SYNOPSIS\n\tproxydns_mgr [OPTIONS]\nDESCRIPTION\n");
+
+				printf("\t-a et --add : ajoute ou modifie si existe une redirection selon le domaine --domain les adresses definies avec --inet --inet6 et --mx\n");
+				printf("\t-r et --remove : supprime une redirection selon l'option --domain\n");
+
+				printf("\t-d et --domain : nom de domaine\n");
+				printf("\t-i et --inet : adresse ipv4\n");
+				printf("\t-I et --inet6 : adresse ipv6\n");
+			       	printf("\t-m et --mx : champ mx");
+				return -1;	
+
+			case 'a':
+				*flag = 0;
+				break;
+			case 'r':
+				*flag = 1;
+				break;
+			case 'd':
+				strcpy(domain,optarg);
+				break;
+			case 'i':
+				strcpy(ipv4,optarg);
+				break;
+			case 'I':
+				strcpy(ipv6,optarg);
+				break;
+			case 'm':
+				strcpy(mx,optarg);
+				break;
+			case '?':
+				return -1;
+
+		}
+	}
+	return 0;
+}
+

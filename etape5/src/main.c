@@ -50,6 +50,10 @@ typedef struct arg_s{
 	int taille;
 }arg_t;
 
+int shmid;
+struct mgr_s * shared_mem;
+int shared_mem_size;
+
 //Fonction handler pour la réception du signal d'arrêt
 void fn(){
 	arret=1;
@@ -63,6 +67,9 @@ void fn(){
 	if(dbg)printf("Arrêt de la biblio = succès\n\n");
 	
 	desallocateMemory();//Désalloue la memoire
+
+	free_shm_addr((void*)shared_mem);//Désalloue l'instance de memshared
+	free_shmid(shmid);//Suppression de sharedmem ipc
 
 	sleep(2);//On attend 1 ou 2 seconde pour que le thread se termine proprement
 
@@ -220,9 +227,7 @@ void proxy_dns(int s, unsigned char* message, int taille_message, void * adresse
 	}
 }
 
-int shmid;
-struct mgr_s * shared_mem;
-int shared_mem_size;
+
 
 int main(int argc,char * argv[]){	
 	int status = args(argc, argv,server, port, strategie, init_args_strategie, configfile); //Réception des arguments

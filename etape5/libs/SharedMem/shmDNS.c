@@ -18,7 +18,6 @@ int get_shm_id(int key,int taille,int option){
 	else{
 		flags = 0006;
 	}
-	printf("%d,%d\n",(key_t)key,taille);
 	if((status=shmget((key_t)key, taille, flags)) == -1){
 			perror("shmget");exit(2);
 	}
@@ -112,6 +111,13 @@ void tidy_mgr(struct mgr_s * p_mgr_s, char *ligne)
 void supp_mgr(struct mgr_s * p_mgr_s)
 {
 	memset(p_mgr_s,0,sizeof(struct mgr_s));
+}
+
+void add_mgr(struct mgr_s * p_mgr_s,char * domaine,char * ipv4,char* ipv6,char* mx){
+	strcpy(p_mgr_s->domaine,domaine);
+	strcpy(p_mgr_s->ipv4,ipv4);
+	strcpy(p_mgr_s->ipv6,ipv6);
+	strcpy(p_mgr_s->mx,mx);
 }
 
 

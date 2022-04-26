@@ -1,3 +1,5 @@
+#ifndef __SHMDNS_H__
+#define __SHMDNS_H___
 #define CLE 6666
 #define NB_SHM_DATA 1024
 
@@ -24,3 +26,8 @@ int free_shmid(int);
 void tidy_mgr(struct mgr_s *, char *);
 
 void supp_mgr(struct mgr_s * );
+
+void add_mgr(struct mgr_s *,char*,char*,char*,char*);
+
+
+#endif
