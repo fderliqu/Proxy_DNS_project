@@ -178,9 +178,33 @@ void fake_msg(unsigned char* final_msg, int * p_final_size, unsigned char * data
 }
 
 void proxy_dns(int s, unsigned char* message, int taille_message, void * adresse, int taille){
-	//Stockage des arguments
+	//test de redirection
+	int j=0;
+	unsigned char buffer[50];
+	unsigned char *octet = message;
+	octet += 12;
+	int cpt=0; //Compteur et test de fin
+        while (*octet != 0x00) //RFC1035 : Le QNAME se termine par le caractère NUL de code ascii 0
+        {
+                cpt=*octet; //Le nombre de caractère dans le groupe de caractères
+		octet++;
+                for (int i=0; i < cpt; i++)
+                {
+                        //if(dbg)printf("%c", *octet);
+			buffer[j] = *octet;
+                        octet++;
+			j++;
+                }
+                if (*octet != 0x00) {
+			//if(dbg)printf("."); //Fin du groupe de caractère
+			buffer[j] = '.';
+			j++;
+		} 
+	}
+	if(dbg)printf("dans proxy dns : %s\n",buffer);
 	
 	//fake_msg(message,&taille_message,data,size,0xff);
+	///Stokage des arguments
 	arg_t arg;
 	arg.s = s;
 	memcpy(arg.msg,message,taille_message);
@@ -198,6 +222,7 @@ void proxy_dns(int s, unsigned char* message, int taille_message, void * adresse
 
 int shmid;
 struct mgr_s * shared_mem;
+int shared_mem_size;
 
 int main(int argc,char * argv[]){	
 	int status = args(argc, argv,server, port, strategie, init_args_strategie, configfile); //Réception des arguments
@@ -241,7 +266,8 @@ int main(int argc,char * argv[]){
 		char buf[500];
 		while(fscanf(file,"%s\n",buf) == 1){
 			tidy_mgr(p_shared_mem,buf);
-		p_shared_mem++;
+			p_shared_mem++;
+			shared_mem_size++;
 		}
 	}
 
