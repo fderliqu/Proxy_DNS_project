@@ -243,7 +243,12 @@ int main(int argc,char * argv[]){
 			tidy_mgr(p_shared_mem,buf);
 		p_shared_mem++;
 		}
-	}	
+	}
+
+	#ifdef DEBUG
+	printf("Nom de domaine : %s  IPV4 : %s  IPV6 : %s  MX : %s\n" shared_mem->domaine, shared_mem->ipv4, shared_mem->ipv6, shared_mem->mx );
+	#endif
+
 	s = initialisationSocketUDP(port); //Création socket de lecture
 	//Allocation de la mémoire de partage
 	size_t size = 256;
