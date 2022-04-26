@@ -121,3 +121,26 @@ int send_rep_proxy_dns(int s, unsigned char* message, int taille_message, void *
 	return 0;
 }
 
+int nomVersAdresse(char *hote,unsigned char *buffer)
+{
+struct sockaddr_storage adresse; 
+struct addrinfo *resultat,*origine;
+int i;
+int statut=getaddrinfo(hote,NULL,NULL,&origine);
+if(statut==EAI_NONAME) return -1;
+if(statut<0){ perror("nomVersAdresse.getaddrinfo"); exit(EXIT_FAILURE); }
+struct addrinfo *p;
+for(p=origine,resultat=origine;p!=NULL;p=p->ai_next)
+  if(p->ai_family==AF_INET6){ resultat=p; break; }
+memcpy(&adresse,resultat->ai_addr,resultat->ai_addrlen);
+if(adresse.ss_family==PF_INET6){
+  struct sockaddr_in6 *s6=(struct sockaddr_in6 *)&adresse;
+  for(i=0;i<16;i++) buffer[i] = s6->sin6_addr.s6_addr[i];
+  }
+if(adresse.ss_family==PF_INET){
+  struct sockaddr_in *s4=(struct sockaddr_in *)&adresse;
+  for(i=0;i<4;i++) buffer[i] = ((unsigned char *)&s4->sin_addr.s_addr)[i];
+  }
+return 0;
+
+}
