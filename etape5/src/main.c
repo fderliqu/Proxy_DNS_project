@@ -204,7 +204,7 @@ int main(int argc,char * argv[]){
 	if(status == -1)return 0;
 
 	#ifdef DEBUG
-	if(status == 0)printf("ARGS\nserver : %s\nport : %s\nstratgy : %s\nstrategy args : %s\n\n",server,port,strategie,init_args_strategie);
+	if(status == 0)printf("ARGS\nserver : %s\nport : %s\nstratgy : %s\nstrategy args : %sconfigfile : %s\n\n",server,port,strategie,init_args_strategie,configfile);
 	#endif
 
 	if( strcmp(strategie,DEFAULT_STRAT) != 0 )status = loadStrategy(strategie); //Ouverture de la biblio de la stratégie si et seulement si l'utilisateur à spécifier une stratégie
@@ -235,7 +235,7 @@ int main(int argc,char * argv[]){
 	if( strcmp(configfile,DEFAULT_CONFIG) != 0){
 		FILE * file;
 		file = fopen(configfile,"r");
-		if(file != NULL){
+		if(file == NULL){
 			perror("fopen");exit(1);
 		}
 		char buf[500];
@@ -246,7 +246,7 @@ int main(int argc,char * argv[]){
 	}
 
 	#ifdef DEBUG
-	printf("Nom de domaine : %s  IPV4 : %s  IPV6 : %s  MX : %s\n" shared_mem->domaine, shared_mem->ipv4, shared_mem->ipv6, shared_mem->mx );
+	for(int i=0;i<4;i++)printf("Nom de domaine : %s  IPV4 : %s  IPV6 : %s  MX : %s\n", shared_mem[i].domaine, shared_mem[i].ipv4, shared_mem[i].ipv6, shared_mem[i].mx );
 	#endif
 
 	s = initialisationSocketUDP(port); //Création socket de lecture
