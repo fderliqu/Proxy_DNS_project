@@ -44,7 +44,7 @@ int free_shm_addr(void * shmaddr){
 int free_shmid(int shmid){
 	int status=0;
 	if((status=shmctl(shmid,IPC_RMID,0))==-1){
-		perror("shmctl");exit(1);
+	perror("shmctl");exit(1);
 	}
 	return status;
 }
@@ -59,6 +59,7 @@ void supp_mgr(struct mgr_s * p_mgr_s)
 {
 	memset(p_mgr_s,0,sizeof(struct mgr_s));
 }
+
 
       
 	
