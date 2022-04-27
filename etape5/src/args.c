@@ -115,7 +115,7 @@ int args_mgr(int argc, char * argv[],char * domain, char * ipv4, char * ipv6, ch
 				printf("\t-d et --domain : nom de domaine\n");
 				printf("\t-i et --inet : adresse ipv4\n");
 				printf("\t-I et --inet6 : adresse ipv6\n");
-			       	printf("\t-m et --mx : champ mx");
+			       	printf("\t-m et --mx : champ mx\n");
 				return -1;	
 
 			case 'a':

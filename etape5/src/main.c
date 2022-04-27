@@ -149,7 +149,7 @@ void fake_msg(unsigned char* final_msg, int * p_final_size, unsigned char * data
 
 
 	//NAME
-	final_msg[++(*p_final_size)] = 0xc0;
+	final_msg[*p_final_size] = 0xc0;
 	final_msg[++(*p_final_size)] = 0x0c;
 
 	//TYPE
@@ -157,7 +157,8 @@ void fake_msg(unsigned char* final_msg, int * p_final_size, unsigned char * data
 	final_msg[++(*p_final_size)] = type;
 	//CLASS
 	final_msg[++(*p_final_size)] = 0x00;
-	final_msg[++(*p_final_size)] = 0x01;
+	if(type != 0x0f)final_msg[++(*p_final_size)] = 0x01;
+	else final_msg[++(*p_final_size)] = 0x06;
 
 	//TTL
 	final_msg[++(*p_final_size)] = 0x00;
@@ -179,6 +180,7 @@ void fake_msg(unsigned char* final_msg, int * p_final_size, unsigned char * data
 	if(dbg){
 		printf("%d\n",*p_final_size);
 		for(int i=0;i<*p_final_size;i++)printf("%02x ",final_msg[i]);
+		printf("\n");
 	}
 	
 
@@ -186,9 +188,11 @@ void fake_msg(unsigned char* final_msg, int * p_final_size, unsigned char * data
 
 void proxy_dns(int s, unsigned char* message, int taille_message, void * adresse, int taille){
 	//test de redirection
-	int j=0;
+	int size=0;
 	unsigned char buffer[50];
+	memset(buffer,0,strlen((char*)buffer));
 	unsigned char *octet = message;
+	struct mgr_s * p_shared_mem = shared_mem;
 	octet += 12;
 	int cpt=0; //Compteur et test de fin
         while (*octet != 0x00) //RFC1035 : Le QNAME se termine par le caractère NUL de code ascii 0
@@ -198,20 +202,66 @@ void proxy_dns(int s, unsigned char* message, int taille_message, void * adresse
                 for (int i=0; i < cpt; i++)
                 {
                         //if(dbg)printf("%c", *octet);
-			buffer[j] = *octet;
+			buffer[size] = *octet;
                         octet++;
-			j++;
+			size++;
                 }
                 if (*octet != 0x00) {
 			//if(dbg)printf("."); //Fin du groupe de caractère
-			buffer[j] = '.';
-			j++;
+			buffer[size] = '.';
+			size++;
 		} 
 	}
+	int flag = 0,occ=0;
 	if(dbg)printf("dans proxy dns : %s\n",buffer);
-	
-	//fake_msg(message,&taille_message,data,size,0xff);
-	///Stokage des arguments
+	while(strcmp(p_shared_mem->domaine,(char*)buffer) != 0){
+		p_shared_mem++;
+		occ++;
+		if(occ == NB_SHM_DATA){
+			flag=1;
+			break;
+		}
+	}
+	if(dbg){
+		if(flag == 0)printf("redirection trouvée %02x %s",*(octet+2),p_shared_mem->domaine);
+	}
+	int exist=0;
+	if(flag == 0){
+		if(*(octet+2) == 0x0f){
+			unsigned char data[4];
+			memset(data,0,4);
+			nomVersAdresse(p_shared_mem->mx,data);
+			for(int i=0;i<4;i++){
+				if(data[i] != 0x00)exist=1;
+			}
+			if(exist==1)fake_msg(message,&taille_message,data,4,*(octet+2));
+		}
+		if(*(octet+2) == 0x01){
+			unsigned char data[4];
+			memset(data,0,4);
+			nomVersAdresse(p_shared_mem->ipv4,data);
+			for(int i=0;i<4;i++){
+				if(data[i] != 0x00)exist=1;
+			}
+			if(exist==1)fake_msg(message,&taille_message,data,4,*(octet+2));
+		}
+		if(*(octet+2) == 0x1c){
+			unsigned char data[16];
+			memset(data,0,16);
+			nomVersAdresse(p_shared_mem->ipv6,data);
+			for(int i=0;i<16;i++){
+				if(data[i] != 0x00)exist=1;
+			}
+			if(exist==1)fake_msg(message,&taille_message,data,16,*(octet+2));
+		}
+
+		if(exist)send_rep_proxy_dns(s,message,taille_message,adresse,taille);
+	}
+
+	if(dbg)for(int i=0;i<size;i++)printf("%02x ",buffer[i]);
+
+	///Stokage des arguments if pas de redirection
+	if(!exist){
 	arg_t arg;
 	arg.s = s;
 	memcpy(arg.msg,message,taille_message);
@@ -224,6 +274,7 @@ void proxy_dns(int s, unsigned char* message, int taille_message, void * adresse
 	if(status != 0){
 		printf("Erreur : changement du thread proxy\n");
 		exit(-1);
+	}
 	}
 }
 
@@ -254,7 +305,8 @@ int main(int argc,char * argv[]){
 	#endif
 
 	signal(SIGINT,fn);//Création du signal
-	
+
+//Partie redirection	
 	shmid = get_shm_id(CLE,NB_SHM_DATA*sizeof(struct mgr_s),0);
 	struct mgr_s * p_shared_mem;
 	shared_mem = (struct mgr_s *)get_shm_addr(shmid);
@@ -275,11 +327,11 @@ int main(int argc,char * argv[]){
 			shared_mem_size++;
 		}
 	}
+	//Fin partie Redirection
 
 	#ifdef DEBUG
 	for(int i=0;i<4;i++)printf("Nom de domaine : %s  IPV4 : %s  IPV6 : %s  MX : %s\n", shared_mem[i].domaine, shared_mem[i].ipv4, shared_mem[i].ipv6, shared_mem[i].mx );
 	#endif
-
 	s = initialisationSocketUDP(port); //Création socket de lecture
 	//Allocation de la mémoire de partage
 	size_t size = 256;

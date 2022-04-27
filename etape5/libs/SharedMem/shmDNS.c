@@ -7,7 +7,7 @@
 #include<sys/sem.h>
 #include"shmDNS.h"
 
-
+#define NONE "none"
 
 int get_shm_id(int key,int taille,int option){
 	int status=0;
@@ -47,6 +47,41 @@ int free_shmid(int shmid){
 	}
 	return status;
 }
+
+int get_semget_id(int key, int taille, int option){
+	int id;
+	int flags;
+	if(option==0){
+		flags = 0666|IPC_CREAT;
+	}
+	else{
+		flags = 0666;
+	}
+	if((id=semget((key_t)key,taille,flags)) < 0){
+		perror("semget");exit(1);
+	}
+	return id;
+}
+/*
+int init_sem(int id, int taille, union semun u){
+	int status;
+	if((status=semctl(id,0,SETVAL,u)) < 0){
+		perror("semctl");exit(2);
+	}
+	return status;
+}
+*/
+
+int op_sem(int id,int op){
+	if(op!=1 || op!=1)return -1;
+	int status=0;
+	struct sembuf buf = {0,op,SEM_UNDO};
+	if((status=semop(id, &buf, 1)) < 0){
+			perror("semop");exit(1);
+	}
+	return status;
+}
+
 
 void tidy_mgr(struct mgr_s * p_mgr_s, char *ligne)
 {
@@ -114,6 +149,7 @@ void supp_mgr(struct mgr_s * p_mgr_s)
 }
 
 void add_mgr(struct mgr_s * p_mgr_s,char * domaine,char * ipv4,char* ipv6,char* mx){
+	memset(p_mgr_s,0,sizeof(struct mgr_s));
 	strcpy(p_mgr_s->domaine,domaine);
 	strcpy(p_mgr_s->ipv4,ipv4);
 	strcpy(p_mgr_s->ipv6,ipv6);

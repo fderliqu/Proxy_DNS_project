@@ -23,6 +23,12 @@ int free_shm_addr(void *);
 
 int free_shmid(int);
 
+int get_semget_id(int ,int,int);
+
+//int init_sem(int,int,union);
+
+int op_sem(int,int);
+
 void tidy_mgr(struct mgr_s *, char *);
 
 void supp_mgr(struct mgr_s * );

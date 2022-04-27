@@ -108,13 +108,7 @@ int boucleServeurUDP(int s,void (* traitement)(int,unsigned char*,int,void *,int
 }
 
 int send_rep_proxy_dns(int s, unsigned char* message, int taille_message, void * adresse, int taille){
-	int nboctets = sendto(s,message,taille_message,0,(struct sockaddr *)adresse,taille);/*
-	unsigned char* octet = message;
-	for(int i=0;i<taille_message;i++){
-		printf("%02x ",*octet);
-		octet++;
-	}
-	printf("\n");*/
+	int nboctets = sendto(s,message,taille_message,0,(struct sockaddr *)adresse,taille);
 	if(nboctets<0){
 		perror("send_rep_proxy_dns_generique.sendto");return -1;
 	}
