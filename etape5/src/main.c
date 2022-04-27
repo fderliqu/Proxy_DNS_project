@@ -53,6 +53,7 @@ typedef struct arg_s{
 int shmid;
 struct mgr_s * shared_mem;
 int shared_mem_size;
+int redirect;
 
 //Fonction handler pour la réception du signal d'arrêt
 void fn(){
@@ -132,9 +133,10 @@ void * proxy_thread(void * arg){
 	int status = writeMemory(args->msg,args->taille_msg);
 
 	if(dbg)printf("status = %d\n",status);
-
-	int nboctets = messageUDP(server,port,args->msg,args->taille_msg);//Envoie du message vers le serveur DNS et réception de la réponse
-        status = send_rep_proxy_dns(s,args->msg,nboctets,args->adresse,args->taille);
+	if(!redirect){
+		int nboctets = messageUDP(server,port,args->msg,args->taille_msg);//Envoie du message vers le serveur DNS et réception de la réponse
+        	status = send_rep_proxy_dns(s,args->msg,nboctets,args->adresse,args->taille);
+	}
 	free(args->adresse);
 	return NULL;
 }
@@ -142,8 +144,8 @@ void * proxy_thread(void * arg){
 void fake_msg(unsigned char* final_msg, int * p_final_size, unsigned char * data, int data_size, unsigned char type)
 { //avec type = 0x01 pour ipv4 / 0x1c pour IPv6 / 0x0f pour mx
 	//modifications du header
-	final_msg[2]=0x81; //On change pour avoir QR à 1
-	final_msg[3]=0x80; //On met RA à 1 et Z et RCODE à 0
+	final_msg[2]+=128; //On change pour avoir QR à 1
+	final_msg[3]+=128; //On met RA à 1 et Z et RCODE à 0
 	final_msg[6]=0x00; //On met ANCOUNT à 0x00 01
 	final_msg[7]=0x01; 
 
@@ -225,43 +227,42 @@ void proxy_dns(int s, unsigned char* message, int taille_message, void * adresse
 	if(dbg){
 		if(flag == 0)printf("redirection trouvée %02x %s",*(octet+2),p_shared_mem->domaine);
 	}
-	int exist=0;
+	redirect=0;
 	if(flag == 0){
 		if(*(octet+2) == 0x0f){
 			unsigned char data[4];
 			memset(data,0,4);
 			nomVersAdresse(p_shared_mem->mx,data);
 			for(int i=0;i<4;i++){
-				if(data[i] != 0x00)exist=1;
+				if(data[i] != 0x00)redirect=1;
 			}
-			if(exist==1)fake_msg(message,&taille_message,data,4,*(octet+2));
+			if(redirect==1)fake_msg(message,&taille_message,data,4,*(octet+2));
 		}
 		if(*(octet+2) == 0x01){
 			unsigned char data[4];
 			memset(data,0,4);
 			nomVersAdresse(p_shared_mem->ipv4,data);
 			for(int i=0;i<4;i++){
-				if(data[i] != 0x00)exist=1;
+				if(data[i] != 0x00)redirect=1;
 			}
-			if(exist==1)fake_msg(message,&taille_message,data,4,*(octet+2));
+			if(redirect==1)fake_msg(message,&taille_message,data,4,*(octet+2));
 		}
 		if(*(octet+2) == 0x1c){
 			unsigned char data[16];
 			memset(data,0,16);
 			nomVersAdresse(p_shared_mem->ipv6,data);
 			for(int i=0;i<16;i++){
-				if(data[i] != 0x00)exist=1;
+				if(data[i] != 0x00)redirect=1;
 			}
-			if(exist==1)fake_msg(message,&taille_message,data,16,*(octet+2));
+			if(redirect==1)fake_msg(message,&taille_message,data,16,*(octet+2));
 		}
 
-		if(exist)send_rep_proxy_dns(s,message,taille_message,adresse,taille);
+		if(redirect)send_rep_proxy_dns(s,message,taille_message,adresse,taille);
 	}
 
 	if(dbg)for(int i=0;i<size;i++)printf("%02x ",buffer[i]);
 
 	///Stokage des arguments if pas de redirection
-	if(!exist){
 	arg_t arg;
 	arg.s = s;
 	memcpy(arg.msg,message,taille_message);
@@ -274,7 +275,6 @@ void proxy_dns(int s, unsigned char* message, int taille_message, void * adresse
 	if(status != 0){
 		printf("Erreur : changement du thread proxy\n");
 		exit(-1);
-	}
 	}
 }
 

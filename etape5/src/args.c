@@ -116,6 +116,7 @@ int args_mgr(int argc, char * argv[],char * domain, char * ipv4, char * ipv6, ch
 				printf("\t-i et --inet : adresse ipv4\n");
 				printf("\t-I et --inet6 : adresse ipv6\n");
 			       	printf("\t-m et --mx : champ mx\n");
+				printf("EXEMPLE\n\t<path>/dnsproxy_mgr -r -d www.google.com -> supprime la redirection www.google.com\n\t<path>/dnsproxy_mgr -d www.twitter.com -i 172.26.26.26 -I fe::6 -m 172.23.23.48 -a -> ajoute ou modifie le domaine www.twitter.com avec les adresses définies avec -i -I -m\n");
 				return -1;	
 
 			case 'a':
